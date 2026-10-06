@@ -1,0 +1,212 @@
+<div class="alerts-page">
+
+<app-sidebar></app-sidebar>
+
+  <main class="alerts-main">
+
+```
+<div class="alerts-content">
+
+  <div class="page-header">
+
+    <div>
+      <h2>Alertas</h2>
+
+      <p>
+        Estudiantes que requieren seguimiento por presentar riesgo medio o alto.
+      </p>
+    </div>
+
+    <div class="alert-summary">
+      <span>Alertas activas</span>
+
+      <strong>
+        {{ estudiantes.length }}
+      </strong>
+    </div>
+
+  </div>
+
+  @if (estudiantes.length > 0) {
+
+    <section class="alerts-card">
+
+      <div class="alerts-card-header">
+
+        <div>
+          <h3>Alertas de riesgo</h3>
+
+          <p>
+            Revise el nivel de riesgo y realice las acciones de seguimiento correspondientes.
+          </p>
+        </div>
+
+      </div>
+
+      <div class="alerts-table-container">
+
+        <table class="alerts-table">
+
+          <thead>
+
+            <tr>
+
+              <th>
+                N.º
+              </th>
+
+              <th>
+                Estudiante
+              </th>
+
+              <th>
+                Grado
+              </th>
+
+              <th>
+                Sección
+              </th>
+
+              <th>
+                Nivel de riesgo
+              </th>
+
+              <th>
+                Estado
+              </th>
+
+              <th>
+                Acción
+              </th>
+
+            </tr>
+
+          </thead>
+
+          <tbody>
+
+            @for (estudiante of estudiantes; track estudiante.id) {
+
+              <tr>
+
+                <td>
+                  {{ estudiante.numeroOrden }}
+                </td>
+
+                <td>
+
+                  <strong>
+                    {{ estudiante.nombres }}
+                    {{ estudiante.apellidos }}
+                  </strong>
+
+                </td>
+
+                <td>
+                  {{ estudiante.grado }}.º
+                </td>
+
+                <td>
+                  {{ estudiante.seccion }}
+                </td>
+
+                <td>
+
+                  <span
+                    class="risk-badge"
+                    [class.risk-high]="estudiante.riesgo === 'Alto'"
+                    [class.risk-medium]="estudiante.riesgo === 'Medio'"
+                  >
+                    {{ estudiante.riesgo }}
+                  </span>
+
+                </td>
+
+                <td>
+
+                  @if (estaAtendida(estudiante.id)) {
+
+                    <span class="status-badge status-attended">
+                      Atendida
+                    </span>
+
+                  } @else {
+
+                    <span class="status-badge status-pending">
+                      Pendiente
+                    </span>
+
+                  }
+
+                </td>
+
+                <td>
+
+                  <div class="action-buttons">
+
+                    <button
+                      type="button"
+                      class="view-button"
+                      (click)="verSeguimiento(
+                        estudiante.id,
+                        estudiante.grado,
+                        estudiante.seccion
+                      )"
+                    >
+                      Ver seguimiento
+                    </button>
+
+                    @if (!estaAtendida(estudiante.id)) {
+
+                      <button
+                        type="button"
+                        class="attend-button"
+                        (click)="atenderAlerta(estudiante.id)"
+                      >
+                        Atender
+                      </button>
+
+                    }
+
+                  </div>
+
+                </td>
+
+              </tr>
+
+            }
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </section>
+
+  } @else {
+
+    <section class="empty-alerts">
+
+      <div class="empty-icon">
+        ✓
+      </div>
+
+      <h3>
+        No hay alertas activas
+      </h3>
+
+      <p>
+        Actualmente no hay estudiantes con nivel de riesgo medio o alto.
+      </p>
+
+    </section>
+
+  }
+
+</div>
+```
+
+  </main>
+
+</div>

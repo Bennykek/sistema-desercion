@@ -1,0 +1,279 @@
+<div class="courses-page">
+
+  <app-sidebar></app-sidebar>
+
+  <main class="courses-main">
+
+    <div class="courses-content">
+
+      <section class="page-header">
+
+        <div>
+
+          <h2>
+            Cursos
+          </h2>
+
+          <p>
+            Administre los cursos correspondientes a cada grado.
+          </p>
+
+        </div>
+
+      </section>
+
+      <section class="selection-card">
+
+        <h3>
+          Seleccionar grado
+        </h3>
+
+        <div class="form-group">
+
+          <label for="grado">
+            Grado
+          </label>
+
+          <select
+            id="grado"
+            [(ngModel)]="grado"
+          >
+
+            <option value="">
+              Seleccionar grado
+            </option>
+
+            <option value="1">
+              1.º grado
+            </option>
+
+            <option value="2">
+              2.º grado
+            </option>
+
+            <option value="3">
+              3.º grado
+            </option>
+
+            <option value="4">
+              4.º grado
+            </option>
+
+            <option value="5">
+              5.º grado
+            </option>
+
+            <option value="6">
+              6.º grado
+            </option>
+
+          </select>
+
+        </div>
+
+      </section>
+
+      @if (grado !== '') {
+
+        <section class="courses-card">
+
+          <div class="card-header">
+
+            <div>
+
+              <h3>
+                Cursos de {{ grado }}.º grado
+              </h3>
+
+              <p>
+                {{ cursos.length }} cursos registrados
+              </p>
+
+            </div>
+
+            <button
+              type="button"
+              class="add-button"
+              (click)="mostrarAgregarCurso()"
+            >
+              + Agregar curso
+            </button>
+
+          </div>
+
+          @if (mostrarFormulario) {
+
+            <div class="course-form">
+
+              <div class="form-group">
+
+                <label for="nuevoCurso">
+                  Nombre del curso
+                </label>
+
+                <input
+                  id="nuevoCurso"
+                  type="text"
+                  placeholder="Ej. Inglés"
+                  maxlength="100"
+                  [(ngModel)]="nuevoCurso"
+                >
+
+              </div>
+
+              <div class="form-actions">
+
+                <button
+                  type="button"
+                  class="cancel-button"
+                  (click)="cancelarAgregar()"
+                >
+                  Cancelar
+                </button>
+
+                <button
+                  type="button"
+                  class="save-button"
+                  (click)="agregarCurso()"
+                >
+                  Guardar curso
+                </button>
+
+              </div>
+
+            </div>
+
+          }
+
+          @if (mostrarEditar) {
+
+            <div class="course-form">
+
+              <div class="form-group">
+
+                <label for="nombreCursoEditado">
+                  Nombre del curso
+                </label>
+
+                <input
+                  id="nombreCursoEditado"
+                  type="text"
+                  maxlength="100"
+                  [(ngModel)]="nombreCursoEditado"
+                >
+
+              </div>
+
+              <div class="form-actions">
+
+                <button
+                  type="button"
+                  class="cancel-button"
+                  (click)="cancelarEditar()"
+                >
+                  Cancelar
+                </button>
+
+                <button
+                  type="button"
+                  class="save-button"
+                  (click)="guardarEdicion()"
+                >
+                  Guardar cambios
+                </button>
+
+              </div>
+
+            </div>
+
+          }
+
+          <div class="table-container">
+
+            <table>
+
+              <thead>
+
+                <tr>
+
+                  <th>
+                    N.º
+                  </th>
+
+                  <th>
+                    Curso
+                  </th>
+
+                  <th>
+                    Acción
+                  </th>
+
+                </tr>
+
+              </thead>
+
+              <tbody>
+
+                @for (curso of cursos; track curso.id) {
+
+                  <tr>
+
+                    <td>
+                      {{ $index + 1 }}
+                    </td>
+
+                    <td>
+                      {{ curso.nombre }}
+                    </td>
+
+                    <td>
+
+                      <div class="action-buttons">
+
+                        <button
+                          type="button"
+                          class="edit-button"
+                          (click)="mostrarEditarCurso(curso.id)"
+                        >
+                          Editar
+                        </button>
+
+                        <button
+                          type="button"
+                          class="delete-button"
+                          (click)="eliminarCurso(curso.id)"
+                        >
+                          Eliminar
+                        </button>
+
+                      </div>
+
+                    </td>
+
+                  </tr>
+
+                }
+
+              </tbody>
+
+            </table>
+
+            @if (cursos.length === 0) {
+
+              <div class="no-results">
+                No hay cursos registrados para este grado.
+              </div>
+
+            }
+
+          </div>
+
+        </section>
+
+      }
+
+    </div>
+
+  </main>
+
+</div>

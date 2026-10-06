@@ -1,0 +1,461 @@
+<div class="students-page">
+
+  <app-sidebar></app-sidebar>
+
+  <main class="students-main">
+
+    <div class="students-content">
+
+      @if (grado === '' || seccion === '') {
+
+        <section class="selection-section">
+
+          <div class="page-header-simple">
+
+            <h2>
+              Estudiantes
+            </h2>
+
+            <p>
+              Seleccione el grado y la sección para consultar
+              las estudiantes del aula.
+            </p>
+
+          </div>
+
+          <div class="selection-card">
+
+            <h3>
+              Seleccionar aula
+            </h3>
+
+            <div class="selection-fields">
+
+              <div class="form-group">
+
+                <label for="grado">
+                  Grado
+                </label>
+
+                <select
+                  id="grado"
+                  [(ngModel)]="grado"
+                >
+
+                  <option value="">
+                    Seleccionar grado
+                  </option>
+
+                  <option value="1">
+                    1.º grado
+                  </option>
+
+                  <option value="2">
+                    2.º grado
+                  </option>
+
+                  <option value="3">
+                    3.º grado
+                  </option>
+
+                  <option value="4">
+                    4.º grado
+                  </option>
+
+                  <option value="5">
+                    5.º grado
+                  </option>
+
+                  <option value="6">
+                    6.º grado
+                  </option>
+
+                </select>
+
+              </div>
+
+              <div class="form-group">
+
+                <label for="seccion">
+                  Sección
+                </label>
+
+                <input
+                  id="seccion"
+                  type="text"
+                  placeholder="Ingrese la sección"
+                  maxlength="10"
+                  [(ngModel)]="seccion"
+                  (ngModelChange)="seccion = $event.toUpperCase()"
+                >
+
+              </div>
+
+            </div>
+
+            <button
+              type="button"
+              class="students-button"
+              (click)="seleccionarAula()"
+            >
+              Consultar estudiantes
+            </button>
+
+          </div>
+
+        </section>
+
+      } @else {
+
+        <section class="page-header">
+
+          <div>
+
+            <h2>
+              Estudiantes
+            </h2>
+
+            <p>
+              Lista de estudiantes según el grado y sección seleccionados.
+            </p>
+
+          </div>
+
+          <div class="selected-group">
+
+            <span>
+              Grado
+            </span>
+
+            <strong>
+              {{ grado }}.º grado
+            </strong>
+
+          </div>
+
+          <div class="selected-group">
+
+            <span>
+              Sección
+            </span>
+
+            <strong>
+              {{ seccion }}
+            </strong>
+
+          </div>
+
+        </section>
+
+        <section class="students-card">
+
+          <div class="card-header">
+
+            <div class="card-title">
+
+              <h3>
+                Lista de estudiantes
+              </h3>
+
+              <button
+                type="button"
+                class="add-button"
+                (click)="mostrarAgregarEstudiante()"
+              >
+                + Añadir estudiante
+              </button>
+
+            </div>
+
+            <input
+              type="text"
+              placeholder="Buscar estudiante..."
+              [(ngModel)]="busqueda"
+            >
+
+          </div>
+
+          @if (mostrarFormulario) {
+
+            <div class="add-student-form">
+
+              <div class="form-row">
+
+                <div class="form-group order-group">
+
+                  <label for="nuevoNumeroOrden">
+                    N.º de orden
+                  </label>
+
+                  <input
+                    id="nuevoNumeroOrden"
+                    type="number"
+                    min="1"
+                    placeholder="Ej. 15"
+                    [(ngModel)]="nuevoNumeroOrden"
+                  >
+
+                </div>
+
+                <div class="form-group">
+
+                  <label for="nuevosNombres">
+                    Nombres
+                  </label>
+
+                  <input
+                    id="nuevosNombres"
+                    type="text"
+                    placeholder="Ingrese los nombres"
+                    maxlength="100"
+                    [(ngModel)]="nuevosNombres"
+                  >
+
+                </div>
+
+                <div class="form-group">
+
+                  <label for="nuevosApellidos">
+                    Apellidos
+                  </label>
+
+                  <input
+                    id="nuevosApellidos"
+                    type="text"
+                    placeholder="Ingrese los apellidos"
+                    maxlength="100"
+                    [(ngModel)]="nuevosApellidos"
+                  >
+
+                </div>
+
+              </div>
+
+              <div class="form-actions">
+
+                <button
+                  type="button"
+                  class="cancel-button"
+                  (click)="cancelarAgregarEstudiante()"
+                >
+                  Cancelar
+                </button>
+
+                <button
+                  type="button"
+                  class="save-button"
+                  (click)="agregarEstudiante()"
+                >
+                  Guardar estudiante
+                </button>
+
+              </div>
+
+            </div>
+
+          }
+
+          @if (mostrarEditar) {
+
+            <div class="edit-student-form">
+
+              <div class="form-row">
+
+                <div class="form-group order-group">
+
+                  <label for="numeroOrdenEditado">
+                    N.º de orden
+                  </label>
+
+                  <input
+                    id="numeroOrdenEditado"
+                    type="number"
+                    min="1"
+                    [(ngModel)]="numeroOrdenEditado"
+                  >
+
+                </div>
+
+                <div class="form-group">
+
+                  <label for="nombresEditados">
+                    Nombres
+                  </label>
+
+                  <input
+                    id="nombresEditados"
+                    type="text"
+                    placeholder="Ingrese los nombres"
+                    maxlength="100"
+                    [(ngModel)]="nombresEditados"
+                  >
+
+                </div>
+
+                <div class="form-group">
+
+                  <label for="apellidosEditados">
+                    Apellidos
+                  </label>
+
+                  <input
+                    id="apellidosEditados"
+                    type="text"
+                    placeholder="Ingrese los apellidos"
+                    maxlength="100"
+                    [(ngModel)]="apellidosEditados"
+                  >
+
+                </div>
+
+              </div>
+
+              <div class="form-actions">
+
+                <button
+                  type="button"
+                  class="cancel-button"
+                  (click)="cancelarEditar()"
+                >
+                  Cancelar
+                </button>
+
+                <button
+                  type="button"
+                  class="save-button"
+                  (click)="guardarEdicion()"
+                >
+                  Guardar cambios
+                </button>
+
+              </div>
+
+            </div>
+
+          }
+
+          <div class="table-container">
+
+            <table>
+
+              <thead>
+
+                <tr>
+
+                  <th>
+                    N.º de orden
+                  </th>
+
+                  <th>
+                    Estudiante
+                  </th>
+
+                  <th>
+                    Nivel de riesgo
+                  </th>
+
+                  <th>
+                    Acción
+                  </th>
+
+                </tr>
+
+              </thead>
+
+              <tbody>
+
+                @for (estudiante of estudiantesFiltradas; track estudiante.id) {
+
+                  <tr>
+
+                    <td>
+                      {{ estudiante.numeroOrden.toString().padStart(2, '0') }}
+                    </td>
+
+                    <td>
+                      {{ estudiante.nombres }} {{ estudiante.apellidos }}
+                    </td>
+
+                    <td>
+
+                      @if (estudiante.riesgo === 'Bajo') {
+
+                        <span class="risk-badge risk-low">
+                          Bajo
+                        </span>
+
+                      } @else if (estudiante.riesgo === 'Medio') {
+
+                        <span class="risk-badge risk-medium">
+                          Medio
+                        </span>
+
+                      } @else {
+
+                        <span class="risk-badge risk-high">
+                          Alto
+                        </span>
+
+                      }
+
+                    </td>
+
+                    <td>
+
+                      <div class="action-buttons">
+
+                        <button
+                          type="button"
+                          class="view-button"
+                          (click)="verEstudiante(estudiante.id)"
+                        >
+                          Ver
+                        </button>
+
+                        <button
+                          type="button"
+                          class="edit-button"
+                          (click)="mostrarEditarEstudiante(estudiante.id)"
+                        >
+                          Editar
+                        </button>
+
+                        <button
+                          type="button"
+                          class="delete-button"
+                          (click)="eliminarEstudiante(estudiante.id)"
+                        >
+                          Eliminar
+                        </button>
+
+                      </div>
+
+                    </td>
+
+                  </tr>
+
+                }
+
+              </tbody>
+
+            </table>
+
+            @if (estudiantesFiltradas.length === 0) {
+
+              <div class="no-results">
+                No se encontraron estudiantes con ese nombre.
+              </div>
+
+            }
+
+          </div>
+
+        </section>
+
+      }
+
+    </div>
+
+  </main>
+
+</div>

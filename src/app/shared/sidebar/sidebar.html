@@ -1,0 +1,79 @@
+<aside class="sidebar">
+
+  <div class="sidebar-header">
+
+    <img
+      src="logo-mercedes.png"
+      alt="Logo de la I.E. Nuestra Señora de Mercedes"
+    >
+
+    <h2>
+      Sistema de
+      <span>Riesgo Escolar</span>
+    </h2>
+
+  </div>
+
+  <nav class="sidebar-menu">
+
+    <button
+      type="button"
+      class="menu-item"
+      (click)="irInicio()"
+    >
+      <span class="menu-icon">⌂</span>
+      <span>Inicio</span>
+    </button>
+
+    <button
+      type="button"
+      class="menu-item"
+      (click)="irEstudiantes()"
+    >
+      <span class="menu-icon">👩‍🎓</span>
+      <span>Estudiantes</span>
+    </button>
+
+    <button
+      type="button"
+      class="menu-item"
+      (click)="irSeguimiento()"
+    >
+      <span class="menu-icon">▣</span>
+      <span>Seguimiento</span>
+    </button>
+
+    <button
+      type="button"
+      class="menu-item"
+      (click)="irCursos()"
+    >
+      <span class="menu-icon">▤</span>
+      <span>Cursos</span>
+    </button>
+
+    <button
+      type="button"
+      class="menu-item"
+      (click)="irAlertas()"
+    >
+      <span class="menu-icon">⚠</span>
+      <span>Alertas</span>
+    </button>
+
+  </nav>
+
+  <div class="sidebar-footer">
+
+    <button
+      type="button"
+      class="logout-item"
+      (click)="cerrarSesion()"
+    >
+      <span class="menu-icon">↪</span>
+      <span>Cerrar sesión</span>
+    </button>
+
+  </div>
+
+</aside>

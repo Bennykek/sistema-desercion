@@ -1,0 +1,61 @@
+<div class="login-page">
+
+  <div class="login-card">
+
+    <div class="login-header">
+
+      <div class="logo-container">
+        <img
+          src="logo-mercedes.png"
+          alt="Logo de la I.E. Nuestra Señora de Mercedes"
+        >
+      </div>
+
+      <h1>Sistema de Detección de riesgo escolar</h1>
+
+
+
+      <span>I.E. Nuestra Señora de Mercedes</span>
+
+    </div>
+
+    <form class="login-form" (ngSubmit)="iniciarSesion()">
+
+      <div class="form-group">
+
+        <label for="password">
+          Contraseña
+        </label>
+
+        <div class="password-container">
+
+          <span class="password-icon">🔒</span>
+
+          <input
+            id="password"
+            name="password"
+            type="password"
+            [(ngModel)]="password"
+            placeholder="Ingrese su contraseña"
+            autocomplete="current-password"
+          >
+
+        </div>
+
+      </div>
+
+      @if (mostrarError) {
+        <div class="error-message">
+          La contraseña ingresada es incorrecta.
+        </div>
+      }
+
+      <button type="submit" class="login-button">
+        Iniciar sesión
+      </button>
+
+    </form>
+
+  </div>
+
+</div>

@@ -1,0 +1,804 @@
+<div class="tracking-page">
+
+  <app-sidebar></app-sidebar>
+
+  <main class="tracking-main">
+
+    <div class="tracking-content">
+
+      @if (grado === '' || seccion === '' || estudiante === '') {
+
+        <section class="selection-section">
+
+          <div class="page-header-simple">
+
+            <h2>
+              Seguimiento
+            </h2>
+
+            <p>
+              Seleccione el grado, la sección y la estudiante para registrar su seguimiento.
+            </p>
+
+          </div>
+
+          <div class="selection-card">
+
+            <h3>
+              Seleccionar estudiante
+            </h3>
+
+            <div class="selection-fields">
+
+              <div class="form-group">
+
+                <label for="grado">
+                  Grado
+                </label>
+
+                <select
+                  id="grado"
+                  [(ngModel)]="grado"
+                >
+
+                  <option value="">
+                    Seleccionar grado
+                  </option>
+
+                  <option value="1">
+                    1.º grado
+                  </option>
+
+                  <option value="2">
+                    2.º grado
+                  </option>
+
+                  <option value="3">
+                    3.º grado
+                  </option>
+
+                  <option value="4">
+                    4.º grado
+                  </option>
+
+                  <option value="5">
+                    5.º grado
+                  </option>
+
+                  <option value="6">
+                    6.º grado
+                  </option>
+
+                </select>
+
+              </div>
+
+              <div class="form-group">
+
+                <label for="seccion">
+                  Sección
+                </label>
+
+                <input
+                  id="seccion"
+                  type="text"
+                  placeholder="Ingrese la sección"
+                  maxlength="10"
+                  [(ngModel)]="seccion"
+                  (ngModelChange)="seccion = $event.toUpperCase()"
+                >
+
+              </div>
+
+            </div>
+
+            <div class="students-selection">
+
+              <label>
+                Estudiante
+              </label>
+
+              <div class="student-buttons">
+
+                @for (estudianteItem of estudiantes; track estudianteItem.id) {
+
+                  @if (
+                    estudianteItem.grado === grado &&
+                    estudianteItem.seccion === seccion
+                  ) {
+
+                    <button
+                      type="button"
+                      class="student-button"
+                      (click)="seleccionarEstudiante(estudianteItem.id)"
+                    >
+
+                      <span class="student-order">
+                        N.º {{ estudianteItem.numeroOrden }}
+                      </span>
+
+                      <span>
+                        {{ estudianteItem.nombres }}
+                        {{ estudianteItem.apellidos }}
+                      </span>
+
+                    </button>
+
+                  }
+
+                }
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+      } @else {
+
+        <section class="page-header">
+
+          <div>
+
+            <h2>
+              Seguimiento
+            </h2>
+
+            <p>
+              Registro académico y de asistencia de la estudiante seleccionada.
+            </p>
+
+          </div>
+
+          <div class="selected-group">
+
+            <span>
+              Grado
+            </span>
+
+            <strong>
+              {{ grado }}.º grado
+            </strong>
+
+          </div>
+
+          <div class="selected-group">
+
+            <span>
+              Sección
+            </span>
+
+            <strong>
+              {{ seccion }}
+            </strong>
+
+          </div>
+
+        </section>
+
+        <section class="tracking-card">
+
+          @if (estudianteSeleccionada) {
+
+            <!-- DATOS DE LA ESTUDIANTE -->
+
+            <div class="student-header">
+
+              <div>
+
+                <span>
+                  Estudiante seleccionada
+                </span>
+
+                <h3>
+                  {{ estudianteSeleccionada.nombres }}
+                  {{ estudianteSeleccionada.apellidos }}
+                </h3>
+
+                <div class="student-meta">
+
+                  <span>
+                    N.º de orden:
+                    <strong>
+                      {{ estudianteSeleccionada.numeroOrden }}
+                    </strong>
+                  </span>
+
+                  <span>
+                    {{ estudianteSeleccionada.grado }}.º grado
+                  </span>
+
+                  <span>
+                    Sección {{ estudianteSeleccionada.seccion }}
+                  </span>
+
+                </div>
+
+              </div>
+
+              <button
+                type="button"
+                class="back-button"
+                (click)="volver()"
+              >
+                Volver a estudiantes
+              </button>
+
+            </div>
+
+            <!-- FALTAS -->
+
+            <div class="attendance-section">
+
+              <div class="section-header">
+
+                <div>
+
+                  <h3>
+                    Registro de faltas
+                  </h3>
+
+                  <p>
+                    Registre las inasistencias de la estudiante por fecha.
+                  </p>
+
+                </div>
+
+                <button
+                  type="button"
+                  class="add-button"
+                  (click)="mostrarAgregarFalta()"
+                >
+                  + Registrar falta
+                </button>
+
+              </div>
+
+              <div class="attendance-summary">
+
+                <div class="attendance-summary-item">
+
+                  <span>
+                    Total de faltas
+                  </span>
+
+                  <strong>
+                    {{ contarFaltas() }}
+                  </strong>
+
+                </div>
+
+                <div class="attendance-summary-item">
+
+                  <span>
+                    Faltas del semestre
+                  </span>
+
+                  <strong>
+                    {{ contarFaltasSemestre() }}
+                  </strong>
+
+                </div>
+
+              </div>
+
+              @if (mostrarFormularioFalta) {
+
+                <div class="attendance-form">
+
+                  <div class="form-group">
+
+                    <label for="nuevaFecha">
+                      Fecha
+                    </label>
+
+                    <input
+                      id="nuevaFecha"
+                      type="date"
+                      [(ngModel)]="nuevaFecha"
+                    >
+
+                  </div>
+
+                  <div class="form-group">
+
+                    <label for="nuevaObservacion">
+                      Observación
+                    </label>
+
+                    <input
+                      id="nuevaObservacion"
+                      type="text"
+                      maxlength="200"
+                      placeholder="Opcional"
+                      [(ngModel)]="nuevaObservacion"
+                    >
+
+                  </div>
+
+                  <div class="form-actions">
+
+                    <button
+                      type="button"
+                      class="cancel-button"
+                      (click)="cancelarAgregarFalta()"
+                    >
+                      Cancelar
+                    </button>
+
+                    <button
+                      type="button"
+                      class="save-button"
+                      (click)="agregarFalta()"
+                    >
+                      Guardar falta
+                    </button>
+
+                  </div>
+
+                </div>
+
+              }
+
+              @if (mostrarEditarFalta) {
+
+                <div class="attendance-form">
+
+                  <div class="form-group">
+
+                    <label for="fechaEditada">
+                      Fecha
+                    </label>
+
+                    <input
+                      id="fechaEditada"
+                      type="date"
+                      [(ngModel)]="fechaEditada"
+                    >
+
+                  </div>
+
+                  <div class="form-group">
+
+                    <label for="observacionEditada">
+                      Observación
+                    </label>
+
+                    <input
+                      id="observacionEditada"
+                      type="text"
+                      maxlength="200"
+                      [(ngModel)]="observacionEditada"
+                    >
+
+                  </div>
+
+                  <div class="form-actions">
+
+                    <button
+                      type="button"
+                      class="cancel-button"
+                      (click)="cancelarEditarFalta()"
+                    >
+                      Cancelar
+                    </button>
+
+                    <button
+                      type="button"
+                      class="save-button"
+                      (click)="guardarEdicionFalta()"
+                    >
+                      Guardar cambios
+                    </button>
+
+                  </div>
+
+                </div>
+
+              }
+
+              <div class="attendance-table-container">
+
+                <table class="attendance-table">
+
+                  <thead>
+
+                    <tr>
+
+                      <th>
+                        Fecha
+                      </th>
+
+                      <th>
+                        Semestre
+                      </th>
+
+                      <th>
+                        Observación
+                      </th>
+
+                      <th>
+                        Acción
+                      </th>
+
+                    </tr>
+
+                  </thead>
+
+                  <tbody>
+
+                    @for (falta of faltas; track falta.id) {
+
+                      <tr>
+
+                        <td>
+                          {{ falta.fecha }}
+                        </td>
+
+                        <td>
+                          {{ falta.semestre }}.º
+                        </td>
+
+                        <td>
+
+                          @if (falta.observacion !== '') {
+
+                            {{ falta.observacion }}
+
+                          } @else {
+
+                            <span class="not-available">
+                              Sin observación
+                            </span>
+
+                          }
+
+                        </td>
+
+                        <td>
+
+                          <div class="action-buttons">
+
+                            <button
+                              type="button"
+                              class="edit-button"
+                              (click)="mostrarEditarFaltaRegistro(falta.id)"
+                            >
+                              Editar
+                            </button>
+
+                            <button
+                              type="button"
+                              class="delete-button"
+                              (click)="eliminarFalta(falta.id)"
+                            >
+                              Eliminar
+                            </button>
+
+                          </div>
+
+                        </td>
+
+                      </tr>
+
+                    }
+
+                  </tbody>
+
+                </table>
+
+                @if (faltas.length === 0) {
+
+                  <div class="no-results">
+                    No hay faltas registradas para esta estudiante.
+                  </div>
+
+                }
+
+              </div>
+
+            </div>
+
+            <!-- NOTAS -->
+
+            <div class="semester-section">
+
+              <div class="semester-header">
+
+                <div>
+
+                  <h3>
+                    Registro de notas
+                  </h3>
+
+                  <p>
+                    Seleccione el semestre y registre la calificación de cada curso.
+                  </p>
+
+                </div>
+
+                <div class="semester-selector">
+
+                  <label for="semestre">
+                    Semestre
+                  </label>
+
+                  <select
+                    id="semestre"
+                    [(ngModel)]="semestreSeleccionado"
+                    (ngModelChange)="cambiarSemestre()"
+                  >
+
+                    <option [ngValue]="1">
+                      1.er semestre
+                    </option>
+
+                    <option [ngValue]="2">
+                      2.º semestre
+                    </option>
+
+                    <option [ngValue]="3">
+                      3.er semestre
+                    </option>
+
+                    <option [ngValue]="4">
+                      4.º semestre
+                    </option>
+
+                  </select>
+
+                </div>
+
+              </div>
+
+              <div class="grades-table-container">
+
+                <table class="grades-table">
+
+                  <thead>
+
+                    <tr>
+
+                      <th>
+                        N.º
+                      </th>
+
+                      <th>
+                        Curso
+                      </th>
+
+                      <th>
+                        Nota del semestre
+                      </th>
+
+                      <th>
+                        Promedio del curso
+                      </th>
+
+                    </tr>
+
+                  </thead>
+
+                  <tbody>
+
+                    @for (nota of notas; track nota.cursoId) {
+
+                      <tr>
+
+                        <td>
+                          {{ $index + 1 }}
+                        </td>
+
+                        <td>
+
+                          <strong>
+                            {{ nota.nombreCurso }}
+                          </strong>
+
+                        </td>
+
+                        <td>
+
+                          <input
+                            type="number"
+                            min="0"
+                            max="20"
+                            step="0.1"
+                            placeholder="0 - 20"
+                            [(ngModel)]="nota.calificacion"
+                          >
+
+                        </td>
+
+                        <td>
+
+                          @if (calcularPromedioCurso(nota.cursoId) > 0) {
+
+                            <span class="course-average">
+                              {{ calcularPromedioCurso(nota.cursoId) }}
+                            </span>
+
+                          } @else {
+
+                            <span class="not-available">
+                              —
+                            </span>
+
+                          }
+
+                        </td>
+
+                      </tr>
+
+                    }
+
+                  </tbody>
+
+                </table>
+
+                @if (notas.length === 0) {
+
+                  <div class="no-courses">
+                    No hay cursos registrados para este grado.
+                  </div>
+
+                }
+
+              </div>
+
+              <div class="average-summary">
+
+                <div class="average-item">
+
+                  <span>
+                    Promedio del semestre
+                  </span>
+
+                  <strong>
+                    {{ promedioSemestre > 0 ? promedioSemestre : '—' }}
+                  </strong>
+
+                </div>
+
+                <div class="average-item">
+
+                  <span>
+                    Promedio general
+                  </span>
+
+                  <strong>
+                    {{ promedioGeneral > 0 ? promedioGeneral : '—' }}
+                  </strong>
+
+                </div>
+
+              </div>
+
+            </div>
+
+            <!-- OBSERVACIONES -->
+
+            <div class="observation-section">
+
+              <div class="form-group">
+
+                <label for="observaciones">
+                  Observaciones generales
+                </label>
+
+                <textarea
+                  id="observaciones"
+                  rows="4"
+                  placeholder="Ingrese observaciones sobre la estudiante..."
+                  [(ngModel)]="observaciones"
+                ></textarea>
+
+              </div>
+
+            </div>
+
+            <!-- ACCIONES -->
+
+            <div class="tracking-actions">
+
+              <button
+                type="button"
+                class="cancel-button"
+                (click)="cancelar()"
+              >
+                Cancelar
+              </button>
+
+              <button
+                type="button"
+                class="save-button"
+                (click)="guardarNotas()"
+              >
+                Guardar información
+              </button>
+
+            </div>
+
+            <!-- RESULTADO DE RIESGO -->
+
+            @if (guardado) {
+
+              <div class="risk-result">
+
+                <div class="risk-result-header">
+
+                  <span>
+                    Nivel de riesgo identificado
+                  </span>
+
+                  @if (nivelRiesgo === 'Bajo') {
+
+                    <span class="risk-badge risk-low">
+                      Bajo
+                    </span>
+
+                  } @else if (nivelRiesgo === 'Medio') {
+
+                    <span class="risk-badge risk-medium">
+                      Medio
+                    </span>
+
+                  } @else {
+
+                    <span class="risk-badge risk-high">
+                      Alto
+                    </span>
+
+                  }
+
+                </div>
+
+                @if (mostrarAlerta) {
+
+                  <div class="risk-alert">
+
+                    <strong>
+                      Se requiere seguimiento.
+                    </strong>
+
+                    <p>
+                      La estudiante presenta un nivel de riesgo
+                      {{ nivelRiesgo.toLowerCase() }}.
+                      Se recomienda realizar acciones de prevención y seguimiento.
+                    </p>
+
+                  </div>
+
+                } @else {
+
+                  <div class="risk-safe">
+
+                    <strong>
+                      No se generó una alerta de riesgo.
+                    </strong>
+
+                    <p>
+                      La información registrada indica un nivel de riesgo bajo.
+                    </p>
+
+                  </div>
+
+                }
+
+              </div>
+
+            }
+
+          }
+
+        </section>
+
+      }
+
+    </div>
+
+  </main>
+
+</div>
