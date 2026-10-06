@@ -1,20 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+
 import { Sidebar } from '../../shared/sidebar/sidebar';
+
 import {
   EstudiantesService,
   Estudiante
 } from '../../services/estudiantes';
-import {
-  CursosService,
-  Curso
-} from '../../services/cursos';
-import { NotasService } from '../../services/notas';
-import {
-  FaltasService,
-  Falta
-} from '../../services/faltas';
 
 @Component({
   selector: 'app-seguimiento',
@@ -22,505 +15,118 @@ import {
   templateUrl: './seguimiento.html',
   styleUrl: './seguimiento.scss'
 })
-export class Seguimiento {
-
-  estudiante = '';
+export class Seguimiento implements OnInit {
 
   grado = '';
   seccion = '';
+  estudianteId: number | null = null;
 
   estudiantes: Estudiante[] = [];
-  cursos: Curso[] = [];
+  estudiantesFiltradas: Estudiante[] = [];
+  estudianteSeleccionada: Estudiante | null = null;
 
-  estudianteSeleccionada: Estudiante | undefined;
-
-  semestreSeleccionado = 1;
-
-  notas: {
-    cursoId: number;
-    nombreCurso: string;
-    calificacion: number | null;
-  }[] = [];
-
-  promedioSemestre = 0;
-  promedioGeneral = 0;
-
-  faltas: Falta[] = [];
-
-  mostrarFormularioFalta = false;
-  mostrarEditarFalta = false;
-
-  faltaEditando = 0;
-
-  nuevaFecha = '';
-  nuevaObservacion = '';
-
-  fechaEditada = '';
-  observacionEditada = '';
-
-  observaciones = '';
-
-  nivelRiesgo = '';
-  mostrarAlerta = false;
-  guardado = false;
+  cargando = false;
+  error = '';
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private estudiantesService: EstudiantesService,
-    private cursosService: CursosService,
-    private notasService: NotasService,
-    private faltasService: FaltasService
+    private estudiantesService: EstudiantesService
   ) {}
 
   ngOnInit(): void {
-
-    this.estudiantes =
-      this.estudiantesService.obtenerEstudiantes();
-
     this.route.queryParams.subscribe(params => {
+      this.grado = params['grado'] || '';
+      this.seccion = params['seccion'] || '';
+      this.estudianteId = params['estudiante']
+        ? Number(params['estudiante'])
+        : null;
 
-      this.estudiante =
-        params['estudiante'] || '';
-
-      this.grado =
-        params['grado'] || '';
-
-      this.seccion =
-        params['seccion'] || '';
-
-      this.buscarEstudiante();
-
+      this.cargarEstudiantes();
     });
-
   }
 
-  seleccionarEstudiante(id: number): void {
+  cargarEstudiantes(): void {
+    this.cargando = true;
+    this.error = '';
 
-    this.estudiante = id.toString();
+    this.estudiantesService.obtenerEstudiantes().subscribe({
+      next: estudiantes => {
+        this.estudiantes = estudiantes;
 
-    this.buscarEstudiante();
+        if (this.estudianteId !== null) {
+          this.estudianteSeleccionada =
+            estudiantes.find(
+              estudiante => estudiante.id === this.estudianteId
+            ) || null;
 
-  }
+          if (!this.estudianteSeleccionada) {
+            this.error = 'No se encontró la estudiante.';
+          }
+        } else {
+          this.filtrarEstudiantes();
+        }
 
-  buscarEstudiante(): void {
-
-    const id = Number(this.estudiante);
-
-    this.estudianteSeleccionada =
-      this.estudiantes.find(
-        estudiante => estudiante.id === id
-      );
-
-    if (this.estudianteSeleccionada) {
-
-      this.grado =
-        this.estudianteSeleccionada.grado;
-
-      this.seccion =
-        this.estudianteSeleccionada.seccion;
-
-      this.cargarCursos();
-
-      this.cargarFaltas();
-
-    }
-
-  }
-
-  cargarCursos(): void {
-
-    this.cursos =
-      this.cursosService.obtenerCursosPorGrado(
-        this.grado
-      );
-
-    this.cargarNotas();
-
-  }
-
-  cargarNotas(): void {
-
-    if (!this.estudianteSeleccionada) {
-      return;
-    }
-
-    const notasRegistradas =
-      this.notasService.obtenerNotasEstudiante(
-        this.estudianteSeleccionada.id,
-        this.semestreSeleccionado
-      );
-
-    this.notas = this.cursos.map(curso => {
-
-      const notaExistente =
-        notasRegistradas.find(
-          nota => nota.cursoId === curso.id
+        this.cargando = false;
+      },
+      error: error => {
+        console.error(
+          'Error al obtener estudiantes:',
+          error
         );
 
-      return {
+        this.error =
+          'No se pudieron cargar las estudiantes.';
 
-        cursoId: curso.id,
-
-        nombreCurso: curso.nombre,
-
-        calificacion:
-          notaExistente?.calificacion ?? null
-
-      };
-
+        this.cargando = false;
+      }
     });
-
-    this.calcularPromedios();
-
   }
 
-  cargarFaltas(): void {
-
-    if (!this.estudianteSeleccionada) {
-      return;
-    }
-
-    this.faltas =
-      this.faltasService.obtenerFaltasEstudiante(
-        this.estudianteSeleccionada.id
-      );
-
-  }
-
-  cambiarSemestre(): void {
-
-    this.guardado = false;
-
-    this.cargarNotas();
-
-  }
-
-  mostrarAgregarFalta(): void {
-
-    this.nuevaFecha = '';
-
-    this.nuevaObservacion = '';
-
-    this.mostrarFormularioFalta = true;
-
-    this.mostrarEditarFalta = false;
-
-  }
-
-  cancelarAgregarFalta(): void {
-
-    this.nuevaFecha = '';
-
-    this.nuevaObservacion = '';
-
-    this.mostrarFormularioFalta = false;
-
-  }
-
-  agregarFalta(): void {
-
-    if (!this.estudianteSeleccionada) {
-      return;
-    }
-
-    if (this.nuevaFecha.trim() === '') {
-      return;
-    }
-
-    this.faltasService.agregarFalta(
-
-      this.estudianteSeleccionada.id,
-
-      this.nuevaFecha,
-
-      this.nuevaObservacion.trim(),
-
-      this.semestreSeleccionado
-
-    );
-
-    this.cargarFaltas();
-
-    this.cancelarAgregarFalta();
-
-  }
-
-  mostrarEditarFaltaRegistro(id: number): void {
-
-    const falta =
-      this.faltas.find(
-        falta => falta.id === id
-      );
-
-    if (!falta) {
-      return;
-    }
-
-    this.faltaEditando = id;
-
-    this.fechaEditada =
-      falta.fecha;
-
-    this.observacionEditada =
-      falta.observacion;
-
-    this.mostrarEditarFalta = true;
-
-    this.mostrarFormularioFalta = false;
-
-  }
-
-  cancelarEditarFalta(): void {
-
-    this.faltaEditando = 0;
-
-    this.fechaEditada = '';
-
-    this.observacionEditada = '';
-
-    this.mostrarEditarFalta = false;
-
-  }
-
-  guardarEdicionFalta(): void {
+  filtrarEstudiantes(): void {
+    const gradoSeleccionado = this.grado.trim();
+    const seccionSeleccionada =
+      this.seccion.trim().toUpperCase();
 
     if (
-      this.faltaEditando === 0 ||
-      this.fechaEditada.trim() === ''
+      gradoSeleccionado === '' ||
+      seccionSeleccionada === ''
     ) {
-
-      return;
-
-    }
-
-    this.faltasService.editarFalta(
-
-      this.faltaEditando,
-
-      this.fechaEditada,
-
-      this.observacionEditada.trim(),
-
-      this.semestreSeleccionado
-
-    );
-
-    this.cargarFaltas();
-
-    this.cancelarEditarFalta();
-
-  }
-
-  eliminarFalta(id: number): void {
-
-    const falta =
-      this.faltas.find(
-        falta => falta.id === id
-      );
-
-    if (!falta) {
+      this.estudiantesFiltradas = [];
       return;
     }
 
-    const confirmar = window.confirm(
-      '¿Está seguro de eliminar esta falta?'
-    );
-
-    if (!confirmar) {
-      return;
-    }
-
-    this.faltasService.eliminarFalta(id);
-
-    this.cargarFaltas();
-
+    this.estudiantesFiltradas =
+      this.estudiantes
+        .filter(estudiante =>
+          estudiante.grado === gradoSeleccionado &&
+          estudiante.seccion.toUpperCase() === seccionSeleccionada
+        )
+        .sort((a, b) =>
+          a.numeroOrden - b.numeroOrden
+        );
   }
 
-  contarFaltas(): number {
-
-    if (!this.estudianteSeleccionada) {
-      return 0;
-    }
-
-    return this.faltasService.contarFaltas(
-      this.estudianteSeleccionada.id
-    );
-
+  cambiarGrado(): void {
+    this.filtrarEstudiantes();
   }
 
-  contarFaltasSemestre(): number {
-
-    if (!this.estudianteSeleccionada) {
-      return 0;
-    }
-
-    return this.faltasService.contarFaltasPorSemestre(
-
-      this.estudianteSeleccionada.id,
-
-      this.semestreSeleccionado
-
-    );
-
+  cambiarSeccion(): void {
+    this.seccion = this.seccion.toUpperCase();
+    this.filtrarEstudiantes();
   }
 
-  guardarNotas(): void {
-
-    if (!this.estudianteSeleccionada) {
-      return;
-    }
-
-    for (const nota of this.notas) {
-
-      this.notasService.guardarNota(
-
-        this.estudianteSeleccionada.id,
-
-        nota.cursoId,
-
-        this.semestreSeleccionado,
-
-        nota.calificacion
-
-      );
-
-    }
-
-    this.calcularPromedios();
-
-    this.nivelRiesgo =
-      this.calcularRiesgo();
-
-    this.estudiantesService.actualizarRiesgo(
-
-      this.estudianteSeleccionada.id,
-
-      this.nivelRiesgo
-
-    );
-
-    this.mostrarAlerta =
-      this.nivelRiesgo === 'Medio' ||
-      this.nivelRiesgo === 'Alto';
-
-    this.guardado = true;
-
-  }
-
-  calcularPromedios(): void {
-
-    if (!this.estudianteSeleccionada) {
-      return;
-    }
-
-    this.promedioSemestre =
-      this.notasService.calcularPromedioSemestre(
-
-        this.estudianteSeleccionada.id,
-
-        this.semestreSeleccionado
-
-      );
-
-    this.promedioGeneral =
-      this.notasService.calcularPromedioGeneral(
-
-        this.estudianteSeleccionada.id
-
-      );
-
-  }
-
-  calcularPromedioCurso(
-    cursoId: number
-  ): number {
-
-    if (!this.estudianteSeleccionada) {
-      return 0;
-    }
-
-    return this.notasService.calcularPromedioCurso(
-
-      this.estudianteSeleccionada.id,
-
-      cursoId
-
-    );
-
-  }
-
-  calcularRiesgo(): string {
-
-    let puntaje = 0;
-
-    if (this.promedioGeneral > 0) {
-
-      if (this.promedioGeneral < 11) {
-
-        puntaje += 2;
-
-      } else if (this.promedioGeneral < 14) {
-
-        puntaje += 1;
-
+  verSeguimiento(estudiante: Estudiante): void {
+    this.router.navigate(['/seguimiento'], {
+      queryParams: {
+        estudiante: estudiante.id,
+        grado: estudiante.grado,
+        seccion: estudiante.seccion
       }
-
-    }
-
-    const totalFaltas =
-      this.contarFaltas();
-
-    if (totalFaltas >= 10) {
-
-      puntaje += 2;
-
-    } else if (totalFaltas >= 5) {
-
-      puntaje += 1;
-
-    }
-
-    if (puntaje >= 4) {
-      return 'Alto';
-    }
-
-    if (puntaje >= 2) {
-      return 'Medio';
-    }
-
-    return 'Bajo';
-
-  }
-
-  cancelar(): void {
-
-    if (this.estudianteSeleccionada) {
-
-      this.cargarNotas();
-
-    }
-
-    this.guardado = false;
-
-    this.nivelRiesgo = '';
-
-    this.mostrarAlerta = false;
-
+    });
   }
 
   volver(): void {
-
-    this.router.navigate(
-      ['/estudiantes'],
-      {
-        queryParams: {
-          grado: this.grado,
-          seccion: this.seccion
-        }
-      }
-    );
-
+    this.router.navigate(['/dashboard']);
   }
-
 }

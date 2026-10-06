@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, map } from 'rxjs';
 
 export interface Estudiante {
   id: number;
@@ -10,53 +12,50 @@ export interface Estudiante {
   riesgo: string;
 }
 
+interface EstudianteAPI {
+  id: number;
+  numero_orden: number;
+  nombres: string;
+  apellidos: string;
+  grado: string;
+  seccion: string;
+  riesgo: string;
+  created_at?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class EstudiantesService {
 
-  estudiantes: Estudiante[] = [
-    {
-      id: 1,
-      numeroOrden: 1,
-      nombres: 'María',
-      apellidos: 'Quispe Huamán',
-      grado: '4',
-      seccion: 'B',
-      riesgo: 'Bajo'
-    },
-    {
-      id: 2,
-      numeroOrden: 2,
-      nombres: 'Ana',
-      apellidos: 'Pérez López',
-      grado: '4',
-      seccion: 'B',
-      riesgo: 'Medio'
-    },
-    {
-      id: 3,
-      numeroOrden: 3,
-      nombres: 'Lucía',
-      apellidos: 'García Ramos',
-      grado: '4',
-      seccion: 'B',
-      riesgo: 'Alto'
-    },
-    {
-      id: 4,
-      numeroOrden: 4,
-      nombres: 'Sofía',
-      apellidos: 'Torres Quispe',
-      grado: '4',
-      seccion: 'B',
-      riesgo: 'Bajo'
-    }
-  ];
+  private apiUrl = 'http://127.0.0.1:8000';
 
-  obtenerEstudiantes(): Estudiante[] {
-    return this.estudiantes;
+  constructor(
+    private http: HttpClient
+  ) {}
+
+  obtenerEstudiantes(): Observable<Estudiante[]> {
+
+    return this.http
+      .get<EstudianteAPI[]>(
+        `${this.apiUrl}/estudiantes`
+      )
+      .pipe(
+        map(estudiantes =>
+          estudiantes.map(estudiante => ({
+            id: estudiante.id,
+            numeroOrden: estudiante.numero_orden,
+            nombres: estudiante.nombres,
+            apellidos: estudiante.apellidos,
+            grado: estudiante.grado,
+            seccion: estudiante.seccion,
+            riesgo: estudiante.riesgo
+          }))
+        )
+      );
+
   }
+
 
   agregarEstudiante(
     numeroOrden: number,
@@ -64,70 +63,76 @@ export class EstudiantesService {
     apellidos: string,
     grado: string,
     seccion: string
-  ): void {
+  ): Observable<Estudiante> {
 
-    const nuevoId = this.obtenerNuevoId();
-
-    this.estudiantes.push({
-      id: nuevoId,
-      numeroOrden: numeroOrden,
-      nombres: nombres,
-      apellidos: apellidos,
-      grado: grado,
-      seccion: seccion,
-      riesgo: 'Bajo'
-    });
+    return this.http
+      .post<EstudianteAPI>(
+        `${this.apiUrl}/estudiantes`,
+        {
+          numero_orden: numeroOrden,
+          nombres,
+          apellidos,
+          grado,
+          seccion
+        }
+      )
+      .pipe(
+        map(estudiante => ({
+          id: estudiante.id,
+          numeroOrden: estudiante.numero_orden,
+          nombres: estudiante.nombres,
+          apellidos: estudiante.apellidos,
+          grado: estudiante.grado,
+          seccion: estudiante.seccion,
+          riesgo: estudiante.riesgo
+        }))
+      );
 
   }
 
-  actualizarRiesgo(id: number, riesgo: string): void {
-
-    const estudiante = this.estudiantes.find(
-      estudiante => estudiante.id === id
-    );
-
-    if (estudiante) {
-      estudiante.riesgo = riesgo;
-    }
-
-  }
 
   editarEstudiante(
     id: number,
     numeroOrden: number,
     nombres: string,
-    apellidos: string
-  ): void {
+    apellidos: string,
+    grado: string,
+    seccion: string
+  ): Observable<Estudiante> {
 
-    const estudiante = this.estudiantes.find(
-      estudiante => estudiante.id === id
-    );
-
-    if (estudiante) {
-      estudiante.numeroOrden = numeroOrden;
-      estudiante.nombres = nombres;
-      estudiante.apellidos = apellidos;
-    }
+    return this.http
+      .put<EstudianteAPI>(
+        `${this.apiUrl}/estudiantes/${id}`,
+        {
+          numero_orden: numeroOrden,
+          nombres,
+          apellidos,
+          grado,
+          seccion
+        }
+      )
+      .pipe(
+        map(estudiante => ({
+          id: estudiante.id,
+          numeroOrden: estudiante.numero_orden,
+          nombres: estudiante.nombres,
+          apellidos: estudiante.apellidos,
+          grado: estudiante.grado,
+          seccion: estudiante.seccion,
+          riesgo: estudiante.riesgo
+        }))
+      );
 
   }
 
-  eliminarEstudiante(id: number): void {
 
-    this.estudiantes = this.estudiantes.filter(
-      estudiante => estudiante.id !== id
+  eliminarEstudiante(
+    id: number
+  ): Observable<{ mensaje: string }> {
+
+    return this.http.delete<{ mensaje: string }>(
+      `${this.apiUrl}/estudiantes/${id}`
     );
-
-  }
-
-  private obtenerNuevoId(): number {
-
-    if (this.estudiantes.length === 0) {
-      return 1;
-    }
-
-    return Math.max(
-      ...this.estudiantes.map(estudiante => estudiante.id)
-    ) + 1;
 
   }
 

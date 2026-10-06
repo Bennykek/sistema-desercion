@@ -18,27 +18,47 @@ export class Alertas {
 
   estudiantes: Estudiante[] = [];
 
+  cargando = false;
+  error = '';
+
   constructor(
     private router: Router,
     private estudiantesService: EstudiantesService
   ) {}
 
   ngOnInit(): void {
-
     this.cargarAlertas();
-
   }
 
   cargarAlertas(): void {
 
-    this.estudiantes =
-      this.estudiantesService
-        .obtenerEstudiantes()
-        .filter(
-          estudiante =>
+    this.cargando = true;
+    this.error = '';
+
+    this.estudiantesService.obtenerEstudiantes().subscribe({
+
+      next: (estudiantes: Estudiante[]) => {
+
+        this.estudiantes = estudiantes.filter(
+          (estudiante: Estudiante) =>
             estudiante.riesgo === 'Medio' ||
             estudiante.riesgo === 'Alto'
         );
+
+        this.cargando = false;
+
+      },
+
+      error: (error) => {
+
+        console.error('Error al obtener las alertas:', error);
+
+        this.error = 'No se pudieron cargar las alertas.';
+        this.cargando = false;
+
+      }
+
+    });
 
   }
 
@@ -49,17 +69,11 @@ export class Alertas {
   ): void {
 
     this.router.navigate(['/seguimiento'], {
-
       queryParams: {
-
-        estudiante: estudiante,
-
-        grado: grado,
-
-        seccion: seccion
-
+        estudiante,
+        grado,
+        seccion
       }
-
     });
 
   }
@@ -67,9 +81,7 @@ export class Alertas {
   atenderAlerta(estudiante: number): void {
 
     if (!this.alertasAtendidas.includes(estudiante)) {
-
       this.alertasAtendidas.push(estudiante);
-
     }
 
   }

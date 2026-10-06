@@ -22,6 +22,9 @@
 
       </section>
 
+
+      <!-- SELECCIONAR GRADO -->
+
       <section class="selection-card">
 
         <h3>
@@ -37,6 +40,7 @@
           <select
             id="grado"
             [(ngModel)]="grado"
+            (change)="cambiarGrado()"
           >
 
             <option value="">
@@ -73,6 +77,9 @@
 
       </section>
 
+
+      <!-- CURSOS DEL GRADO -->
+
       @if (grado !== '') {
 
         <section class="courses-card">
@@ -100,6 +107,9 @@
             </button>
 
           </div>
+
+
+          <!-- AGREGAR CURSO -->
 
           @if (mostrarFormulario) {
 
@@ -145,6 +155,9 @@
 
           }
 
+
+          <!-- EDITAR CURSO -->
+
           @if (mostrarEditar) {
 
             <div class="course-form">
@@ -187,6 +200,9 @@
             </div>
 
           }
+
+
+          <!-- TABLA -->
 
           <div class="table-container">
 

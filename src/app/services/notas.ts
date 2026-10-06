@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, map } from 'rxjs';
 
 export interface Nota {
   id: number;
@@ -8,43 +10,53 @@ export interface Nota {
   calificacion: number | null;
 }
 
+interface NotaAPI {
+  id: number;
+  estudiante_id: number;
+  curso_id: number;
+  semestre: number;
+  calificacion: number | null;
+  created_at?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class NotasService {
 
-  notas: Nota[] = [];
+  private apiUrl = 'http://127.0.0.1:8000';
 
-  obtenerNotas(): Nota[] {
-    return this.notas;
-  }
+  constructor(private http: HttpClient) {}
 
   obtenerNotasEstudiante(
     estudianteId: number,
     semestre: number
-  ): Nota[] {
+  ): Observable<Nota[]> {
 
-    return this.notas.filter(
-      nota =>
-        nota.estudianteId === estudianteId &&
-        nota.semestre === semestre
-    );
-
+    return this.http
+      .get<NotaAPI[]>(
+        `${this.apiUrl}/notas/estudiante/${estudianteId}/semestre/${semestre}`
+      )
+      .pipe(
+        map(notas =>
+          notas.map(nota => this.convertirNota(nota))
+        )
+      );
   }
 
-  obtenerNota(
-    estudianteId: number,
-    cursoId: number,
-    semestre: number
-  ): Nota | undefined {
+  obtenerTodasLasNotas(
+    estudianteId: number
+  ): Observable<Nota[]> {
 
-    return this.notas.find(
-      nota =>
-        nota.estudianteId === estudianteId &&
-        nota.cursoId === cursoId &&
-        nota.semestre === semestre
-    );
-
+    return this.http
+      .get<NotaAPI[]>(
+        `${this.apiUrl}/notas/estudiante/${estudianteId}`
+      )
+      .pipe(
+        map(notas =>
+          notas.map(nota => this.convertirNota(nota))
+        )
+      );
   }
 
   guardarNota(
@@ -52,66 +64,71 @@ export class NotasService {
     cursoId: number,
     semestre: number,
     calificacion: number | null
-  ): void {
+  ): Observable<Nota> {
 
-    const notaExistente = this.obtenerNota(
-      estudianteId,
-      cursoId,
-      semestre
-    );
-
-    if (notaExistente) {
-
-      notaExistente.calificacion = calificacion;
-
-      return;
-    }
-
-    this.notas.push({
-
-      id: this.obtenerNuevoId(),
-
-      estudianteId: estudianteId,
-
-      cursoId: cursoId,
-
-      semestre: semestre,
-
-      calificacion: calificacion
-
-    });
-
+    return this.http
+      .post<NotaAPI>(
+        `${this.apiUrl}/notas`,
+        {
+          estudiante_id: estudianteId,
+          curso_id: cursoId,
+          semestre,
+          calificacion
+        }
+      )
+      .pipe(
+        map(nota =>
+          this.convertirNota(nota)
+        )
+      );
   }
 
   eliminarNota(
     estudianteId: number,
     cursoId: number,
     semestre: number
-  ): void {
+  ): Observable<{ mensaje: string }> {
 
-    this.notas = this.notas.filter(
-      nota =>
-        !(
-          nota.estudianteId === estudianteId &&
-          nota.cursoId === cursoId &&
-          nota.semestre === semestre
-        )
+    return this.http.delete<{ mensaje: string }>(
+      `${this.apiUrl}/notas/${estudianteId}/${cursoId}/${semestre}`
     );
-
   }
 
   calcularPromedioSemestre(
-    estudianteId: number,
-    semestre: number
+    notas: Nota[]
   ): number {
 
-    const notasEstudiante = this.obtenerNotasEstudiante(
-      estudianteId,
-      semestre
+    return this.calcularPromedio(notas);
+  }
+
+  calcularPromedioCurso(
+    notas: Nota[],
+    cursoId: number
+  ): number {
+
+    const notasCurso = notas.filter(
+      nota =>
+        nota.cursoId === cursoId &&
+        nota.calificacion !== null
     );
 
-    const notasRegistradas = notasEstudiante
-      .filter(nota => nota.calificacion !== null);
+    return this.calcularPromedio(notasCurso);
+  }
+
+  calcularPromedioGeneral(
+    notas: Nota[]
+  ): number {
+
+    return this.calcularPromedio(notas);
+  }
+
+  private calcularPromedio(
+    notas: Nota[]
+  ): number {
+
+    const notasRegistradas = notas.filter(
+      nota => nota.calificacion !== null
+    );
 
     if (notasRegistradas.length === 0) {
       return 0;
@@ -126,73 +143,18 @@ export class NotasService {
     return Number(
       (suma / notasRegistradas.length).toFixed(2)
     );
-
   }
 
-  calcularPromedioCurso(
-    estudianteId: number,
-    cursoId: number
-  ): number {
+  private convertirNota(
+    nota: NotaAPI
+  ): Nota {
 
-    const notasCurso = this.notas.filter(
-      nota =>
-        nota.estudianteId === estudianteId &&
-        nota.cursoId === cursoId &&
-        nota.calificacion !== null
-    );
-
-    if (notasCurso.length === 0) {
-      return 0;
-    }
-
-    const suma = notasCurso.reduce(
-      (total, nota) =>
-        total + (nota.calificacion ?? 0),
-      0
-    );
-
-    return Number(
-      (suma / notasCurso.length).toFixed(2)
-    );
-
+    return {
+      id: nota.id,
+      estudianteId: nota.estudiante_id,
+      cursoId: nota.curso_id,
+      semestre: nota.semestre,
+      calificacion: nota.calificacion
+    };
   }
-
-  calcularPromedioGeneral(
-    estudianteId: number
-  ): number {
-
-    const notasEstudiante = this.notas.filter(
-      nota =>
-        nota.estudianteId === estudianteId &&
-        nota.calificacion !== null
-    );
-
-    if (notasEstudiante.length === 0) {
-      return 0;
-    }
-
-    const suma = notasEstudiante.reduce(
-      (total, nota) =>
-        total + (nota.calificacion ?? 0),
-      0
-    );
-
-    return Number(
-      (suma / notasEstudiante.length).toFixed(2)
-    );
-
-  }
-
-  private obtenerNuevoId(): number {
-
-    if (this.notas.length === 0) {
-      return 1;
-    }
-
-    return Math.max(
-      ...this.notas.map(nota => nota.id)
-    ) + 1;
-
-  }
-
 }
