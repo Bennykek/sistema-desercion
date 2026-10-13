@@ -1,87 +1,59 @@
-<div class="students-page">
 
+<div class="students-page">
   <app-sidebar></app-sidebar>
 
   <main class="students-main">
-
     <div class="students-content">
 
       <section class="page-header">
-
         <div>
-
           <h2>Estudiantes</h2>
-
-          <p>
-            Registre y administre las estudiantes de la institución.
-          </p>
-
+          <p>Registre y administre las estudiantes de la institución.</p>
         </div>
-
       </section>
-
 
       <section class="students-card">
 
         <div class="card-header">
-
           <div class="card-title">
-
             <div>
-
               <h3>Lista de estudiantes</h3>
-
-              <p>
-                {{ estudiantes.length }} estudiantes registradas
-              </p>
-
+              <p>{{ estudiantes.length }} estudiantes registradas</p>
             </div>
-
 
             <button
               type="button"
               class="add-button"
               (click)="mostrarAgregarEstudiante()"
+              [disabled]="cargando"
             >
               + Añadir estudiante
             </button>
-
           </div>
-
 
           <input
             type="text"
             placeholder="Buscar estudiante..."
+            aria-label="Buscar estudiante por nombre o apellido"
             [(ngModel)]="busqueda"
           >
-
         </div>
 
-
         @if (error) {
-
-          <div class="error-message">
+          <div class="error-message" role="alert">
             {{ error }}
           </div>
-
         }
 
-
+        <!-- FORMULARIO DE REGISTRO -->
         @if (mostrarFormulario) {
-
           <div class="add-student-form">
-
             <h4>Registrar estudiante</h4>
-
 
             <div class="form-row">
 
               <div class="form-group order-group">
-
-                <label for="nuevoNumeroOrden">
-                  N.º de orden
-                </label>
-
+                <label for="nuevoNumeroOrden">N.º de orden</label>
                 <input
                   id="nuevoNumeroOrden"
                   type="number"
@@ -89,16 +61,10 @@
                   placeholder="Ej. 15"
                   [(ngModel)]="nuevoNumeroOrden"
                 >
-
               </div>
 
-
               <div class="form-group">
-
-                <label for="nuevosNombres">
-                  Nombres
-                </label>
-
+                <label for="nuevosNombres">Nombres</label>
                 <input
                   id="nuevosNombres"
                   type="text"
@@ -106,16 +72,10 @@
                   maxlength="100"
                   [(ngModel)]="nuevosNombres"
                 >
-
               </div>
 
-
               <div class="form-group">
-
-                <label for="nuevosApellidos">
-                  Apellidos
-                </label>
-
+                <label for="nuevosApellidos">Apellidos</label>
                 <input
                   id="nuevosApellidos"
                   type="text"
@@ -123,60 +83,23 @@
                   maxlength="100"
                   [(ngModel)]="nuevosApellidos"
                 >
-
               </div>
 
-
               <div class="form-group">
-
-                <label for="nuevoGrado">
-                  Grado
-                </label>
-
-                <select
-                  id="nuevoGrado"
-                  [(ngModel)]="nuevoGrado"
-                >
-
-                  <option value="">
-                    Seleccionar grado
-                  </option>
-
-                  <option value="1">
-                    1.º grado
-                  </option>
-
-                  <option value="2">
-                    2.º grado
-                  </option>
-
-                  <option value="3">
-                    3.º grado
-                  </option>
-
-                  <option value="4">
-                    4.º grado
-                  </option>
-
-                  <option value="5">
-                    5.º grado
-                  </option>
-
-                  <option value="6">
-                    6.º grado
-                  </option>
-
+                <label for="nuevoGrado">Grado</label>
+                <select id="nuevoGrado" [(ngModel)]="nuevoGrado">
+                  <option value="">Seleccionar grado</option>
+                  <option value="1">1.º grado</option>
+                  <option value="2">2.º grado</option>
+                  <option value="3">3.º grado</option>
+                  <option value="4">4.º grado</option>
+                  <option value="5">5.º grado</option>
+                  <option value="6">6.º grado</option>
                 </select>
-
               </div>
 
-
               <div class="form-group">
-
-                <label for="nuevaSeccion">
-                  Sección
-                </label>
-
+                <label for="nuevaSeccion">Sección</label>
                 <input
                   id="nuevaSeccion"
                   type="text"
@@ -185,22 +108,19 @@
                   [(ngModel)]="nuevaSeccion"
                   (ngModelChange)="nuevaSeccion = $event.toUpperCase()"
                 >
-
               </div>
 
             </div>
 
-
             <div class="form-actions">
-
               <button
                 type="button"
                 class="cancel-button"
                 (click)="cancelarAgregarEstudiante()"
+                [disabled]="cargando"
               >
                 Cancelar
               </button>
-
 
               <button
                 type="button"
@@ -208,125 +128,64 @@
                 (click)="agregarEstudiante()"
                 [disabled]="cargando"
               >
-
                 {{ cargando ? 'Guardando...' : 'Guardar estudiante' }}
-
               </button>
-
             </div>
-
           </div>
-
         }
 
-
+        <!-- FORMULARIO DE EDICIÓN -->
         @if (mostrarEditar) {
-
           <div class="edit-student-form">
-
             <h4>Editar estudiante</h4>
-
 
             <div class="form-row">
 
               <div class="form-group order-group">
-
-                <label for="numeroOrdenEditado">
-                  N.º de orden
-                </label>
-
+                <label for="numeroOrdenEditado">N.º de orden</label>
                 <input
                   id="numeroOrdenEditado"
                   type="number"
                   min="1"
                   [(ngModel)]="numeroOrdenEditado"
                 >
-
               </div>
 
-
               <div class="form-group">
-
-                <label for="nombresEditados">
-                  Nombres
-                </label>
-
+                <label for="nombresEditados">Nombres</label>
                 <input
                   id="nombresEditados"
                   type="text"
                   maxlength="100"
                   [(ngModel)]="nombresEditados"
                 >
-
               </div>
 
-
               <div class="form-group">
-
-                <label for="apellidosEditados">
-                  Apellidos
-                </label>
-
+                <label for="apellidosEditados">Apellidos</label>
                 <input
                   id="apellidosEditados"
                   type="text"
                   maxlength="100"
                   [(ngModel)]="apellidosEditados"
                 >
-
               </div>
 
-
               <div class="form-group">
-
-                <label for="gradoEditado">
-                  Grado
-                </label>
-
-                <select
-                  id="gradoEditado"
-                  [(ngModel)]="gradoEditado"
-                >
-
-                  <option value="">
-                    Seleccionar grado
-                  </option>
-
-                  <option value="1">
-                    1.º grado
-                  </option>
-
-                  <option value="2">
-                    2.º grado
-                  </option>
-
-                  <option value="3">
-                    3.º grado
-                  </option>
-
-                  <option value="4">
-                    4.º grado
-                  </option>
-
-                  <option value="5">
-                    5.º grado
-                  </option>
-
-                  <option value="6">
-                    6.º grado
-                  </option>
-
+                <label for="gradoEditado">Grado</label>
+                <select id="gradoEditado" [(ngModel)]="gradoEditado">
+                  <option value="">Seleccionar grado</option>
+                  <option value="1">1.º grado</option>
+                  <option value="2">2.º grado</option>
+                  <option value="3">3.º grado</option>
+                  <option value="4">4.º grado</option>
+                  <option value="5">5.º grado</option>
+                  <option value="6">6.º grado</option>
                 </select>
-
               </div>
 
-
               <div class="form-group">
-
-                <label for="seccionEditada">
-                  Sección
-                </label>
-
+                <label for="seccionEditada">Sección</label>
                 <input
                   id="seccionEditada"
                   type="text"
@@ -334,22 +193,19 @@
                   [(ngModel)]="seccionEditada"
                   (ngModelChange)="seccionEditada = $event.toUpperCase()"
                 >
-
               </div>
 
             </div>
 
-
             <div class="form-actions">
-
               <button
                 type="button"
                 class="cancel-button"
                 (click)="cancelarEditar()"
+                [disabled]="cargando"
               >
                 Cancelar
               </button>
-
 
               <button
                 type="button"
@@ -359,164 +215,97 @@
               >
                 {{ cargando ? 'Guardando...' : 'Guardar cambios' }}
               </button>
-
             </div>
-
           </div>
-
         }
 
-
+        <!-- TABLA DE ESTUDIANTES -->
         <div class="table-container">
 
           @if (cargando && estudiantes.length === 0) {
-
             <div class="no-results">
               Cargando estudiantes...
             </div>
-
           } @else {
 
             <table>
-
               <thead>
-
                 <tr>
-
-                  <th class="center-column">
-                    N.º de orden
-                  </th>
-
-                  <th>
-                    Estudiante
-                  </th>
-
-                  <th class="center-column">
-                    Grado
-                  </th>
-
-                  <th class="center-column">
-                    Sección
-                  </th>
-
-                  <th class="center-column">
-                    Nivel de riesgo
-                  </th>
-
-                  <th class="center-column">
-                    Acción
-                  </th>
-
+                  <th class="center-column">N.º de orden</th>
+                  <th>Estudiante</th>
+                  <th class="center-column">Grado</th>
+                  <th class="center-column">Sección</th>
+                  <th class="center-column">Nivel de riesgo</th>
+                  <th class="center-column">Acción</th>
                 </tr>
-
               </thead>
 
-
               <tbody>
-
-                @for (
-                  estudiante of estudiantesFiltradas;
-                  track estudiante.id
-                ) {
-
+                @for (estudiante of estudiantesFiltradas; track estudiante.id) {
                   <tr>
-
                     <td class="center-column">
                       {{ estudiante.numeroOrden.toString().padStart(2, '0') }}
                     </td>
 
-
                     <td>
-                      {{ estudiante.nombres }}
-                      {{ estudiante.apellidos }}
+                      {{ estudiante.nombres }} {{ estudiante.apellidos }}
                     </td>
-
 
                     <td class="center-column">
                       {{ estudiante.grado }}.º
                     </td>
 
-
                     <td class="center-column">
                       {{ estudiante.seccion }}
                     </td>
 
-
                     <td class="center-column">
-
                       @if (estudiante.riesgo === 'Bajo') {
-
-                        <span class="risk-badge risk-low">
-                          Bajo
-                        </span>
-
+                        <span class="risk-badge risk-low">Bajo</span>
                       } @else if (estudiante.riesgo === 'Medio') {
-
-                        <span class="risk-badge risk-medium">
-                          Medio
-                        </span>
-
+                        <span class="risk-badge risk-medium">Medio</span>
+                      } @else if (estudiante.riesgo === 'Alto') {
+                        <span class="risk-badge risk-high">Alto</span>
                       } @else {
-
-                        <span class="risk-badge risk-high">
-                          Alto
-                        </span>
-
+                        <span class="risk-badge risk-pending">Sin analizar</span>
                       }
-
                     </td>
 
-
                     <td class="center-column">
-
                       <div class="action-buttons">
-
                         <button
                           type="button"
                           class="edit-button"
                           (click)="mostrarEditarEstudiante(estudiante.id)"
+                          [disabled]="cargando"
                         >
                           Editar
                         </button>
-
 
                         <button
                           type="button"
                           class="delete-button"
                           (click)="eliminarEstudiante(estudiante.id)"
+                          [disabled]="cargando"
                         >
                           Eliminar
                         </button>
-
                       </div>
-
                     </td>
-
                   </tr>
-
                 }
-
               </tbody>
-
             </table>
 
-
             @if (estudiantesFiltradas.length === 0) {
-
               <div class="no-results">
                 No se encontraron estudiantes.
               </div>
-
             }
-
           }
 
         </div>
-
       </section>
-
     </div>
-
   </main>
-
 </div>

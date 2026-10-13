@@ -8,12 +8,12 @@ import { Router } from '@angular/router';
   styleUrl: './sidebar.scss'
 })
 export class Sidebar {
-
   constructor(private router: Router) {}
 
   irInicio(): void {
-    this.router.navigate(['/dashboard']);
+    this.router.navigate(['/inicio']);
   }
+
 
   irEstudiantes(): void {
     this.router.navigate(['/estudiantes']);
@@ -23,6 +23,10 @@ export class Sidebar {
     this.router.navigate(['/seguimiento']);
   }
 
+  irCursos(): void {
+    this.router.navigate(['/cursos']);
+  }
+
   irAlertas(): void {
     this.router.navigate(['/alertas']);
   }
@@ -30,7 +34,4 @@ export class Sidebar {
   cerrarSesion(): void {
     this.router.navigate(['/login']);
   }
-irCursos(): void {
-  this.router.navigate(['/cursos']);
-}
 }

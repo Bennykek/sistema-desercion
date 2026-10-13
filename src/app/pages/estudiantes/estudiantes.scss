@@ -382,34 +382,51 @@ td:nth-child(2) {
    NIVEL DE RIESGO
    ========================================= */
 
+
+/* Etiquetas de nivel de riesgo */
 .risk-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
-  min-width: 68px;
-  padding: 6px 11px;
-
+  min-width: 100px;
+  padding: 6px 12px;
+  border: 1px solid transparent;
   border-radius: 20px;
-
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  box-sizing: border-box;
 }
 
+/* Riesgo bajo */
 .risk-low {
-  background: #e7f6ed;
-  color: #237a45;
+  color: #166534;
+  background-color: #dcfce7;
+  border-color: #bbf7d0;
 }
 
+/* Riesgo medio */
 .risk-medium {
-  background: #fff4d6;
-  color: #9a6700;
+  color: #92400e;
+  background-color: #fef3c7;
+  border-color: #fde68a;
 }
 
+/* Riesgo alto */
 .risk-high {
-  background: #fde8e8;
-  color: #b42318;
+  color: #991b1b;
+  background-color: #fee2e2;
+  border-color: #fecaca;
 }
+
+/* Pendiente de evaluación */
+.risk-pending {
+  color: #475569;
+  background-color: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
 
 
 /* =========================================
@@ -538,4 +555,9 @@ td.center-column .action-buttons {
 
 .action-buttons {
   justify-content: center;
+}
+.risk-pending {
+  color: #64748b;
+  background-color: #f1f5f9;
+  border: 1px solid #cbd5e1;
 }

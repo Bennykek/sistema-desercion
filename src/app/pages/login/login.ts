@@ -1,3 +1,4 @@
+
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -9,7 +10,6 @@ import { Router } from '@angular/router';
   styleUrl: './login.scss'
 })
 export class Login {
-
   password = '';
   mostrarError = false;
 
@@ -23,7 +23,6 @@ export class Login {
       return;
     }
 
-    this.router.navigate(['/dashboard']);
+    this.router.navigate(['/inicio']);
   }
-
 }

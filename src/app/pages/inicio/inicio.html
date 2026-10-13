@@ -1,0 +1,178 @@
+<div class="inicio-page">
+  <app-sidebar></app-sidebar>
+
+  <main class="inicio-main">
+    <div class="inicio-content">
+
+      <header class="welcome-section">
+        <div>
+          <h1>Resumen general</h1>
+          <p>
+            Sistema de Detección de Riesgo Escolar
+          </p>
+        </div>
+      </header>
+
+      <section class="summary-section">
+        <div class="section-heading">
+          <div>
+            <h2>Estadísticas de estudiantes</h2>
+            <p>Información general de la institución educativa.</p>
+          </div>
+          <span class="update-indicator">
+            <span class="indicator-dot"></span>
+            Actualización automática
+          </span>
+        </div>
+
+        @if (cargando) {
+          <div class="message-card">
+            <span class="loading-spinner"></span>
+            <p>Cargando estadísticas...</p>
+          </div>
+        } @else if (errorCarga) {
+          <div class="message-card error-message">
+            <span class="message-icon">!</span>
+            <div>
+              <h3>No se pudieron cargar las estadísticas</h3>
+              <p>
+                Comprueba que el backend de FastAPI esté activo
+                y vuelve a entrar en Inicio.
+              </p>
+            </div>
+          </div>
+        } @else {
+          <div class="summary-layout">
+
+            <article class="summary-card total-card">
+              <div class="card-top">
+                <span class="card-label">Total de estudiantes</span>
+                <span class="card-icon total-icon">👩‍🎓</span>
+              </div>
+
+              <strong class="main-number">{{ totalEstudiantes }}</strong>
+              <span class="card-description">
+                Estudiantes registradas en el sistema
+              </span>
+            </article>
+
+            <article class="summary-card evaluated-card">
+              <div class="card-top">
+                <span class="card-label">Estudiantes evaluadas</span>
+                <span class="card-icon evaluated-icon">✓</span>
+              </div>
+
+              <strong class="main-number">
+                {{ riesgoBajo + riesgoMedio + riesgoAlto }}
+              </strong>
+              <span class="card-description">
+                Con nivel de riesgo identificado
+              </span>
+            </article>
+
+            <article class="summary-card medium-card">
+              <div class="card-top">
+                <span class="card-label">Riesgo medio</span>
+                <span class="card-icon medium-icon">!</span>
+              </div>
+
+              <strong class="main-number">{{ riesgoMedio }}</strong>
+              <span class="card-description">
+                Requieren atención y seguimiento
+              </span>
+            </article>
+
+            <article class="summary-card high-card">
+              <div class="card-top">
+                <span class="card-label">Riesgo alto</span>
+                <span class="card-icon high-icon">⚠</span>
+              </div>
+
+              <strong class="main-number">{{ riesgoAlto }}</strong>
+              <span class="card-description">
+                Requieren atención prioritaria
+              </span>
+            </article>
+
+          </div>
+
+          <article class="summary-card risk-card">
+            <div class="chart-header">
+              <div>
+                <h2>Distribución de niveles de riesgo</h2>
+                <p>Proporción de estudiantes según su evaluación.</p>
+              </div>
+              <span class="chart-total">
+                {{ riesgoBajo + riesgoMedio + riesgoAlto }} evaluadas
+              </span>
+            </div>
+
+            @if (riesgoBajo + riesgoMedio + riesgoAlto === 0) {
+              <div class="empty-chart">
+                <div class="empty-chart-symbol">◔</div>
+                <h3>Aún no hay evaluaciones</h3>
+                <p>
+                  El gráfico aparecerá cuando existan estudiantes
+                  con un nivel de riesgo registrado.
+                </p>
+              </div>
+            } @else {
+              <div class="risk-content">
+                <div
+                  class="risk-chart"
+                  [style.background]="graficoFondo"
+                  role="img"
+                  aria-label="Gráfico circular de distribución de niveles de riesgo"
+                >
+                  <div class="chart-center">
+                    <strong>
+                      {{ riesgoBajo + riesgoMedio + riesgoAlto }}
+                    </strong>
+                    <span>Evaluadas</span>
+                  </div>
+                </div>
+
+                <div class="risk-legend">
+
+                  <div class="legend-item">
+                    <div class="legend-label">
+                      <span class="legend-dot low"></span>
+                      <span>Sin riesgo o bajo</span>
+                    </div>
+                    <strong>{{ riesgoBajo }}</strong>
+                  </div>
+
+                  <div class="legend-item">
+                    <div class="legend-label">
+                      <span class="legend-dot medium"></span>
+                      <span>Riesgo medio</span>
+                    </div>
+                    <strong>{{ riesgoMedio }}</strong>
+                  </div>
+
+                  <div class="legend-item">
+                    <div class="legend-label">
+                      <span class="legend-dot high"></span>
+                      <span>Riesgo alto</span>
+                    </div>
+                    <strong>{{ riesgoAlto }}</strong>
+                  </div>
+
+                  <div class="legend-item">
+                    <div class="legend-label">
+                      <span class="legend-dot pending"></span>
+                      <span>Pendientes de análisis</span>
+                    </div>
+                    <strong>{{ pendientes }}</strong>
+                  </div>
+
+                </div>
+              </div>
+            }
+          </article>
+        }
+      </section>
+
+    </div>
+  </main>
+</div>

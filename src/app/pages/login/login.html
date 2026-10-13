@@ -1,61 +1,61 @@
 <div class="login-page">
-
   <div class="login-card">
 
-    <div class="login-header">
+    <!-- Imagen lateral -->
+    <div class="login-image">
+      <div class="image-overlay">
+        <span class="image-label">I.E. Nuestra Señora de Mercedes</span>
+        <h2>Educación, compromiso y futuro.</h2>
+        <p>Identificamos el riesgo para acompañar a cada estudiante.</p>
+      </div>
+    </div>
 
-      <div class="logo-container">
+    <!-- Formulario de acceso -->
+    <div class="login-content">
+      <div class="login-header">
         <img
           src="logo-mercedes.png"
           alt="Logo de la I.E. Nuestra Señora de Mercedes"
+          class="login-logo"
         >
+
+        <span class="institution">I.E. Nuestra Señora de Mercedes</span>
+        <h1>Sistema de Detección de Riesgo Escolar</h1>
+        <p>Riesgo de Deserción Escolar</p>
       </div>
 
-      <h1>Sistema de Detección de riesgo escolar</h1>
+      <form class="login-form" (ngSubmit)="iniciarSesion()">
+        <div class="form-group">
+          <label for="password">Contraseña de acceso</label>
 
+          <div class="password-container">
+            <span class="password-icon" aria-hidden="true">🔒</span>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              [(ngModel)]="password"
+              placeholder="Ingrese su contraseña"
+              autocomplete="current-password"
+              required
+            >
+          </div>
+        </div>
 
+        @if (mostrarError) {
+          <div class="error-message" role="alert">
+            La contraseña ingresada es incorrecta.
+          </div>
+        }
 
-      <span>I.E. Nuestra Señora de Mercedes</span>
+        <button type="submit" class="login-button">
+          Iniciar sesión
+          <span aria-hidden="true">→</span>
+        </button>
+      </form>
 
+      <p class="login-footer">Acceso exclusivo para usuarios autorizados</p>
     </div>
 
-    <form class="login-form" (ngSubmit)="iniciarSesion()">
-
-      <div class="form-group">
-
-        <label for="password">
-          Contraseña
-        </label>
-
-        <div class="password-container">
-
-          <span class="password-icon">🔒</span>
-
-          <input
-            id="password"
-            name="password"
-            type="password"
-            [(ngModel)]="password"
-            placeholder="Ingrese su contraseña"
-            autocomplete="current-password"
-          >
-
-        </div>
-
-      </div>
-
-      @if (mostrarError) {
-        <div class="error-message">
-          La contraseña ingresada es incorrecta.
-        </div>
-      }
-
-      <button type="submit" class="login-button">
-        Iniciar sesión
-      </button>
-
-    </form>
-
   </div>
-
 </div>

@@ -1,403 +1,634 @@
-<div class="tracking-page">
 
+<div class="tracking-page">
   <app-sidebar></app-sidebar>
 
   <main class="tracking-main">
-
     <div class="tracking-content">
 
-      <!-- ================================================= -->
-      <!-- LISTA DE ESTUDIANTES -->
-      <!-- ================================================= -->
-
-      <section class="page-header-simple">
-
-        <div>
-
-          <h2>
-            Seguimiento
-          </h2>
-
-          <p>
-            Seleccione el grado y la sección para consultar las estudiantes.
-          </p>
-
-        </div>
-
-      </section>
-
-
-      <section class="selection-card">
-
-        <div class="selection-card-header">
-
+      @if (estudianteSeleccionada; as estudiante) {
+        <section class="page-header-simple">
           <div>
-
-            <h3>
-              Buscar estudiantes
-            </h3>
-
-            <p>
-              Seleccione el grado y registre la sección.
-            </p>
-
+            <h2>Ficha de seguimiento</h2>
+            <p>Información académica, asistencia y seguimiento escolar.</p>
           </div>
 
-        </div>
+          <button type="button" class="view-button" (click)="volver()">
+            Volver a la lista
+          </button>
+        </section>
 
-
-        <div class="selection-fields">
-
-          <!-- GRADO -->
-
-          <div class="form-group">
-
-            <label for="grado">
-              Grado
-            </label>
-
-            <select
-              id="grado"
-              [(ngModel)]="grado"
-              (ngModelChange)="cambiarGrado()"
-            >
-
-              <option value="">
-                Seleccionar grado
-              </option>
-
-              <option value="1">
-                1.º grado
-              </option>
-
-              <option value="2">
-                2.º grado
-              </option>
-
-              <option value="3">
-                3.º grado
-              </option>
-
-              <option value="4">
-                4.º grado
-              </option>
-
-              <option value="5">
-                5.º grado
-              </option>
-
-              <option value="6">
-                6.º grado
-              </option>
-
-            </select>
-
-          </div>
-
-
-          <!-- SECCIÓN -->
-
-          <div class="form-group">
-
-            <label for="seccion">
-              Sección
-            </label>
-
-            <input
-              id="seccion"
-              type="text"
-              maxlength="10"
-              placeholder="Ej. A"
-              [(ngModel)]="seccion"
-              (ngModelChange)="cambiarSeccion()"
-            >
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-      <!-- ================================================= -->
-      <!-- RESULTADOS -->
-      <!-- ================================================= -->
-
-      <section class="students-card">
-
-        <div class="students-card-header">
-
-          <div>
-
-            <h3>
-              Estudiantes
-            </h3>
-
-            @if (grado !== '' && seccion !== '') {
-
+        <!-- Datos de la estudiante -->
+        <section class="students-card">
+          <div class="students-card-header">
+            <div>
+              <h3>{{ estudiante.nombres }} {{ estudiante.apellidos }}</h3>
               <p>
-                Estudiantes de {{ grado }}.º grado -
-                Sección {{ seccion }}
+                N.º de orden: {{ estudiante.numeroOrden }}
+                · Grado: {{ estudiante.grado }}.º
+                · Sección: {{ estudiante.seccion }}
               </p>
+            </div>
+          </div>
+        </section>
 
-            } @else {
-
-              <p>
-                Seleccione un grado y una sección para mostrar las estudiantes.
-              </p>
-
-            }
-
+        <!-- Asistencia -->
+        <section class="selection-card">
+          <div class="selection-card-header">
+            <div>
+              <h3>Asistencia</h3>
+              <p>Registra y consulta las asistencias de la estudiante.</p>
+            </div>
           </div>
 
-
-          @if (grado !== '' && seccion !== '') {
-
-            <div class="student-count">
-
-              {{ estudiantesFiltradas.length }}
-
-              @if (estudiantesFiltradas.length === 1) {
-                estudiante
-              } @else {
-                estudiantes
-              }
-
+          <div class="selection-fields">
+            <div class="form-group">
+              <label for="fechaAsistencia">Fecha</label>
+              <input
+                id="fechaAsistencia"
+                type="date"
+                [(ngModel)]="fechaAsistencia"
+              >
             </div>
 
+            <div class="form-group">
+              <label for="estadoAsistencia">Estado</label>
+              <select
+                id="estadoAsistencia"
+                [(ngModel)]="estadoAsistencia"
+              >
+                <option value="Asistió">Asistió</option>
+                <option value="Inasistió">Inasistió</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="semestreAsistencia">Semestre</label>
+              <select
+                id="semestreAsistencia"
+                [(ngModel)]="semestreAsistencia"
+              >
+                <option [ngValue]="1">1.er semestre</option>
+                <option [ngValue]="2">2.º semestre</option>
+                <option [ngValue]="3">3.er semestre</option>
+                <option [ngValue]="4">4.º semestre</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="observacionAsistencia">
+              Observación (opcional)
+            </label>
+            <textarea
+              id="observacionAsistencia"
+              rows="3"
+              maxlength="500"
+              placeholder="Escribe una observación sobre la asistencia..."
+              [(ngModel)]="observacionAsistencia"
+            ></textarea>
+          </div>
+
+          <button
+            type="button"
+            class="view-button"
+            [disabled]="guardandoAsistencia"
+            (click)="guardarAsistencia()"
+          >
+            {{ guardandoAsistencia ? 'Guardando...' : 'Guardar asistencia' }}
+          </button>
+
+          @if (errorAsistencia) {
+            <div class="state-message error-state">
+              <strong>{{ errorAsistencia }}</strong>
+            </div>
           }
 
-        </div>
-
-
-        <!-- CARGANDO -->
-
-        @if (cargando) {
-
-          <div class="state-message">
-
-            <div class="loading-spinner"></div>
-
-            <span>
-              Cargando estudiantes...
-            </span>
-
-          </div>
-
-        }
-
-
-        <!-- ERROR -->
-
-        @if (!cargando && error !== '') {
-
-          <div class="state-message error-state">
-
-            <strong>
-              {{ error }}
-            </strong>
-
-          </div>
-
-        }
-
-
-        <!-- SIN FILTRO -->
-
-        @if (
-          !cargando &&
-          error === '' &&
-          (grado === '' || seccion === '')
-        ) {
-
-          <div class="state-message empty-state">
-
-            <div class="empty-icon">
-              🔎
+          @if (mensajeAsistencia) {
+            <div class="state-message success-state">
+              <strong>{{ mensajeAsistencia }}</strong>
             </div>
+          }
 
-            <strong>
-              Seleccione grado y sección
-            </strong>
-
-            <span>
-              Aquí aparecerá la lista de estudiantes.
-            </span>
-
-          </div>
-
-        }
-
-
-        <!-- SIN RESULTADOS -->
-
-        @if (
-          !cargando &&
-          error === '' &&
-          grado !== '' &&
-          seccion !== '' &&
-          estudiantesFiltradas.length === 0
-        ) {
-
-          <div class="state-message empty-state">
-
-            <div class="empty-icon">
-              👩‍🎓
+          <div class="students-card-header section-heading">
+            <div>
+              <h3>Historial de asistencia</h3>
+              <p>Registros ordenados del más reciente al más antiguo.</p>
             </div>
-
-            <strong>
-              No hay estudiantes registradas
-            </strong>
-
-            <span>
-              No se encontraron estudiantes para
-              {{ grado }}.º grado, sección {{ seccion }}.
-            </span>
-
           </div>
 
-        }
-
-
-        <!-- TABLA -->
-
-        @if (
-          !cargando &&
-          error === '' &&
-          estudiantesFiltradas.length > 0
-        ) {
-
-          <div class="students-table-container">
-
-            <table class="students-table">
-
-              <thead>
-
-                <tr>
-
-                  <th>
-                    N.º
-                  </th>
-
-                  <th>
-                    Estudiante
-                  </th>
-
-                  <th>
-                    Grado
-                  </th>
-
-                  <th>
-                    Sección
-                  </th>
-
-                  <th>
-                    Acción
-                  </th>
-
-                </tr>
-
-              </thead>
-
-
-              <tbody>
-
-                @for (
-                  estudiante of estudiantesFiltradas;
-                  track estudiante.id
-                ) {
-
+          @if (cargandoAsistencias) {
+            <div class="state-message">
+              <div class="loading-spinner"></div>
+              <span>Cargando historial...</span>
+            </div>
+          } @else if (asistencias.length === 0 && !errorAsistencia) {
+            <div class="state-message empty-state">
+              <strong>No hay registros de asistencia</strong>
+              <span>
+                Registra la primera asistencia utilizando el formulario.
+              </span>
+            </div>
+          } @else if (asistencias.length > 0) {
+            <div class="students-table-container">
+              <table class="students-table">
+                <thead>
                   <tr>
-
-                    <td class="order-cell">
-
-                      {{ estudiante.numeroOrden }}
-
-                    </td>
-
-
-                    <td>
-
-                      <div class="student-name">
-
-                        <div class="student-avatar">
-
-                          {{ estudiante.nombres.charAt(0) }}
-
-                        </div>
-
-                        <div>
-
-                          <strong>
-                            {{ estudiante.nombres }}
-                            {{ estudiante.apellidos }}
-                          </strong>
-
-                        </div>
-
-                      </div>
-
-                    </td>
-
-
-                    <td>
-
-                      <span class="grade-badge">
-
-                        {{ estudiante.grado }}.º
-
-                      </span>
-
-                    </td>
-
-
-                    <td>
-
-                      <span class="section-badge">
-
-                        {{ estudiante.seccion }}
-
-                      </span>
-
-                    </td>
-
-
-                    <td>
-
-                      <button
-                        type="button"
-                        class="view-button"
-                        (click)="verSeguimiento(estudiante)"
-                      >
-
-                        <span>
-                          Ver seguimiento
-                        </span>
-
-                        <span class="arrow">
-                          →
-                        </span>
-
-                      </button>
-
-                    </td>
-
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                    <th>Semestre</th>
+                    <th>Observación</th>
+                    <th>Acción</th>
                   </tr>
+                </thead>
+                <tbody>
+                  @for (asistencia of asistencias; track asistencia.id) {
+                    <tr>
+                      <td>{{ asistencia.fecha }}</td>
+                      <td>
+                        <span class="section-badge">
+                          {{ asistencia.estado }}
+                        </span>
+                      </td>
+                      <td>{{ asistencia.semestre }}</td>
+                      <td>
+                        {{ asistencia.observacion || 'Sin observación' }}
+                      </td>
+                      <td>
+                        <button
+                          type="button"
+                          class="delete-action"
+                          [disabled]="eliminandoRegistro"
+                          (click)="eliminarAsistencia(asistencia)"
+                        >
+                          Eliminar
+                        </button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </section>
 
-                }
-
-              </tbody>
-
-            </table>
-
+        <!-- Calificaciones -->
+        <section class="selection-card">
+          <div class="selection-card-header">
+            <div>
+              <h3>Calificaciones</h3>
+              <p>Consulta y registra las notas por curso y semestre.</p>
+            </div>
           </div>
 
-        }
+          <div class="selection-fields">
+            <div class="form-group">
+              <label for="semestreNotas">Semestre académico</label>
+              <select
+                id="semestreNotas"
+                [(ngModel)]="semestreNotas"
+                (ngModelChange)="cambiarSemestreNotas()"
+              >
+                <option [ngValue]="1">1.er semestre</option>
+                <option [ngValue]="2">2.º semestre</option>
+                <option [ngValue]="3">3.er semestre</option>
+                <option [ngValue]="4">4.º semestre</option>
+              </select>
+            </div>
+          </div>
 
-      </section>
+          @if (cargandoNotas) {
+            <div class="state-message">
+              <div class="loading-spinner"></div>
+              <span>Cargando calificaciones...</span>
+            </div>
+          } @else if (cursos.length === 0 && errorNotas) {
+            <div class="state-message error-state">
+              <strong>{{ errorNotas }}</strong>
+            </div>
+          } @else if (cursos.length === 0) {
+            <div class="state-message empty-state">
+              <strong>No hay cursos registrados para este grado</strong>
+              <span>Verifica los cursos disponibles en el módulo Cursos.</span>
+            </div>
+          } @else {
+            <div class="students-table-container">
+              <table class="students-table">
+                <thead>
+                  <tr>
+                    <th>Curso</th>
+                    <th>Nota (0–20)</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (curso of cursos; track curso.id) {
+                    <tr>
+                      <td>
+                        <strong>{{ curso.nombre }}</strong>
+                      </td>
+                      <td>
+                        <input
+                          type="number"
+                          min="0"
+                          max="20"
+                          step="0.01"
+                          [attr.aria-label]="'Nota de ' + curso.nombre"
+                          placeholder="Sin nota"
+                          [(ngModel)]="calificacionesEdicion[curso.id]"
+                        >
+                      </td>
+                      <td>
+                        <div class="table-actions">
+                          <button
+                            type="button"
+                            class="view-button"
+                            [disabled]="guardandoNotaCurso !== null"
+                            (click)="guardarNota(curso)"
+                          >
+                            {{
+                              guardandoNotaCurso === curso.id
+                                ? 'Guardando...'
+                                : 'Guardar'
+                            }}
+                          </button>
+
+                          @if (obtenerNotaCurso(curso.id) !== null) {
+                            <button
+                              type="button"
+                              class="delete-action"
+                              [disabled]="guardandoNotaCurso !== null"
+                              (click)="eliminarNota(curso)"
+                            >
+                              Eliminar
+                            </button>
+                          }
+                        </div>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+
+            <div class="students-card-header section-heading">
+              <div>
+                <h3>Promedio del semestre</h3>
+                <p>Promedio de las calificaciones registradas.</p>
+              </div>
+              <strong>
+                {{ obtenerPromedioSemestre() | number:'1.2-2' }} / 20
+              </strong>
+            </div>
+          }
+
+          @if (errorNotas && cursos.length > 0) {
+            <div class="state-message error-state">
+              <strong>{{ errorNotas }}</strong>
+            </div>
+          }
+
+          @if (mensajeNotas) {
+            <div class="state-message success-state">
+              <strong>{{ mensajeNotas }}</strong>
+            </div>
+          }
+        </section>
+
+        <!-- Observaciones de seguimiento -->
+        <section class="selection-card">
+          <div class="selection-card-header">
+            <div>
+              <h3>Observaciones de seguimiento</h3>
+              <p>Registra información relevante sobre la estudiante.</p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="textoObservacion">Nueva observación</label>
+            <textarea
+              id="textoObservacion"
+              rows="4"
+              maxlength="2000"
+              placeholder="Escribe la observación..."
+              [(ngModel)]="textoObservacion"
+            ></textarea>
+          </div>
+
+          <button
+            type="button"
+            class="view-button"
+            [disabled]="guardandoObservacion || !textoObservacion.trim()"
+            (click)="guardarObservacion()"
+          >
+            {{
+              guardandoObservacion
+                ? 'Guardando...'
+                : 'Guardar observación'
+            }}
+          </button>
+
+          @if (errorObservaciones) {
+            <div class="state-message error-state">
+              <strong>{{ errorObservaciones }}</strong>
+            </div>
+          }
+
+          @if (mensajeObservaciones) {
+            <div class="state-message success-state">
+              <strong>{{ mensajeObservaciones }}</strong>
+            </div>
+          }
+
+          <div class="students-card-header section-heading">
+            <div>
+              <h3>Historial de observaciones</h3>
+              <p>Consulta las observaciones registradas.</p>
+            </div>
+          </div>
+
+          @if (cargandoObservaciones) {
+            <div class="state-message">
+              <div class="loading-spinner"></div>
+              <span>Cargando observaciones...</span>
+            </div>
+          } @else if (observaciones.length === 0 && !errorObservaciones) {
+            <div class="state-message empty-state">
+              <strong>No hay observaciones registradas</strong>
+              <span>
+                Las observaciones guardadas aparecerán aquí.
+              </span>
+            </div>
+          } @else if (observaciones.length > 0) {
+            <div class="students-table-container">
+              <table class="students-table">
+                <thead>
+                  <tr>
+                    <th>Fecha</th>
+                    <th>Observación</th>
+                    <th>Acción</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (item of observaciones; track item.id) {
+                    <tr>
+                      <td>{{ item.fecha }}</td>
+                      <td>{{ item.observacion }}</td>
+                      <td>
+                        <button
+                          type="button"
+                          class="delete-action"
+                          [disabled]="eliminandoRegistro"
+                          (click)="eliminarObservacion(item)"
+                        >
+                          Eliminar
+                        </button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </section>
+
+      } @else {
+        <!-- Búsqueda de estudiantes -->
+        <section class="page-header-simple">
+          <div>
+            <h2>Seguimiento</h2>
+            <p>
+              Selecciona un grado y una sección para consultar a las estudiantes.
+            </p>
+          </div>
+        </section>
+
+        <section class="selection-card">
+          <div class="selection-card-header">
+            <div>
+              <h3>Buscar estudiantes</h3>
+              <p>Filtra la lista por grado y sección.</p>
+            </div>
+          </div>
+
+          <div class="selection-fields">
+            <div class="form-group">
+              <label for="grado">Grado</label>
+              <select
+                id="grado"
+                [(ngModel)]="grado"
+                (ngModelChange)="cambiarGrado()"
+              >
+                <option value="">Seleccionar grado</option>
+                <option value="1">1.º grado</option>
+                <option value="2">2.º grado</option>
+                <option value="3">3.º grado</option>
+                <option value="4">4.º grado</option>
+                <option value="5">5.º grado</option>
+                <option value="6">6.º grado</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="seccion">Sección</label>
+              <input
+                id="seccion"
+                type="text"
+                maxlength="10"
+                placeholder="Ej. A"
+                [(ngModel)]="seccion"
+                (ngModelChange)="cambiarSeccion()"
+              >
+            </div>
+          </div>
+        </section>
+
+        <section class="students-card">
+          <div class="students-card-header">
+            <div>
+              <h3>Estudiantes</h3>
+              @if (grado && seccion.trim()) {
+                <p>Grado {{ grado }}.º · Sección {{ seccion }}</p>
+              } @else {
+                <p>Selecciona el grado y la sección para ver la lista.</p>
+              }
+            </div>
+
+            @if (grado && seccion.trim() && !cargando && !error) {
+              <div class="student-count">
+                {{ estudiantesFiltradas.length }}
+                {{
+                  estudiantesFiltradas.length === 1
+                    ? 'estudiante'
+                    : 'estudiantes'
+                }}
+              </div>
+            }
+          </div>
+
+          @if (cargando) {
+            <div class="state-message">
+              <div class="loading-spinner"></div>
+              <span>Cargando estudiantes...</span>
+            </div>
+          } @else if (error) {
+            <div class="state-message error-state">
+              <strong>{{ error }}</strong>
+            </div>
+          } @else if (!grado || !seccion.trim()) {
+            <div class="state-message empty-state">
+              <div class="empty-icon">🔎</div>
+              <strong>Selecciona grado y sección</strong>
+              <span>La lista aparecerá aquí.</span>
+            </div>
+          } @else if (estudiantesFiltradas.length === 0) {
+            <div class="state-message empty-state">
+              <div class="empty-icon">👩‍🎓</div>
+              <strong>No se encontraron estudiantes</strong>
+              <span>
+                No hay estudiantes registradas en el grado {{ grado }}.º,
+                sección {{ seccion }}.
+              </span>
+            </div>
+          } @else {
+            <div class="students-table-container">
+              <table class="students-table">
+                <thead>
+                  <tr>
+                    <th>N.º de orden</th>
+                    <th>Estudiante</th>
+                    <th>Grado</th>
+                    <th>Sección</th>
+                    <th>Acción</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (
+                    estudiante of estudiantesFiltradas;
+                    track estudiante.id
+                  ) {
+                    <tr>
+                      <td class="order-cell">
+                        {{ estudiante.numeroOrden }}
+                      </td>
+                      <td>
+                        <div class="student-name">
+                          <div class="student-avatar">
+                            {{ estudiante.nombres.charAt(0) }}
+                          </div>
+                          <strong>
+                            {{ estudiante.nombres }} {{ estudiante.apellidos }}
+                          </strong>
+                        </div>
+                      </td>
+                      <td>
+                        <span class="grade-badge">
+                          {{ estudiante.grado }}.º
+                        </span>
+                      </td>
+                      <td>
+                        <span class="section-badge">
+                          {{ estudiante.seccion }}
+                        </span>
+                      </td>
+                      <td>
+                        <button
+                          type="button"
+                          class="view-button"
+                          (click)="verSeguimiento(estudiante)"
+                        >
+                          Ver seguimiento
+                        </button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </section>
+      }
+
+      <!-- Modal de confirmación para eliminar registros -->
+      @if (confirmacionAbierta) {
+        <div
+          class="modal-overlay"
+          (click)="cancelarEliminacion()"
+          (keydown.escape)="cancelarEliminacion()"
+        >
+          <section
+            class="confirmation-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="confirmation-title"
+            (click)="$event.stopPropagation()"
+          >
+            <div class="confirmation-icon" aria-hidden="true">!</div>
+
+            <h2 id="confirmation-title">Confirmar eliminación</h2>
+
+            @if (
+              tipoEliminacion === 'asistencia' &&
+              asistenciaPendiente
+            ) {
+              <p>
+                ¿Deseas eliminar la asistencia del
+                <strong>{{ asistenciaPendiente.fecha }}</strong>?
+              </p>
+              <p class="modal-note">
+                Este registro dejará de aparecer en el historial.
+              </p>
+            } @else if (
+              tipoEliminacion === 'nota' &&
+              cursoPendiente
+            ) {
+              <p>
+                ¿Deseas eliminar la nota de
+                <strong>{{ cursoPendiente.nombre }}</strong>
+                del semestre {{ semestreNotas }}?
+              </p>
+              <p class="modal-note">
+                Esta acción quitará la calificación registrada.
+              </p>
+            } @else if (
+              tipoEliminacion === 'observacion' &&
+              observacionPendiente
+            ) {
+              <p>
+                ¿Deseas eliminar esta observación del
+                <strong>{{ observacionPendiente.fecha }}</strong>?
+              </p>
+              <p class="modal-note">
+                Esta acción eliminará la observación del historial.
+              </p>
+            }
+
+            <div class="modal-actions">
+              <button
+                type="button"
+                class="cancel-button"
+                [disabled]="eliminandoRegistro"
+                (click)="cancelarEliminacion()"
+              >
+                Cancelar
+              </button>
+
+              <button
+                type="button"
+                class="delete-button"
+                [disabled]="eliminandoRegistro"
+                (click)="confirmarEliminacion()"
+              >
+                {{
+                  eliminandoRegistro
+                    ? 'Eliminando...'
+                    : 'Eliminar registro'
+                }}
+              </button>
+            </div>
+          </section>
+        </div>
+      }
 
     </div>
-
   </main>
-
 </div>
